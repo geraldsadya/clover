@@ -2,40 +2,45 @@
 
 /**
  * Golden Test Set Evaluation Script
- * 
+ *
  * This script runs the golden test set to verify that the cover letter generator
  * produces high-quality, non-hallucinated results across different scenarios.
- * 
+ *
  * Usage: php scripts/eval.php
  */
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
 // Bootstrap Laravel application
-$app = require_once __DIR__ . '/../bootstrap/app.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
 $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use App\Services\CoverLetterGenerator;
-use App\Services\PdfExtractor;
 use App\Services\OpenAIClient;
+use App\Services\PdfExtractor;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 
 class GoldenTestEvaluator
 {
     private CoverLetterGenerator $generator;
+
     private PdfExtractor $pdfExtractor;
+
     private OpenAIClient $openaiClient;
+
     private array $testResults = [];
+
     private int $passedTests = 0;
+
     private int $totalTests = 0;
+
     private float $lastCallAt = 0.0;
 
     public function __construct()
     {
-        $this->generator = new CoverLetterGenerator();
-        $this->pdfExtractor = new PdfExtractor();
-        $this->openaiClient = new OpenAIClient();
+        $this->generator = new CoverLetterGenerator;
+        $this->pdfExtractor = new PdfExtractor;
+        $this->openaiClient = new OpenAIClient;
     }
 
     /**
@@ -46,12 +51,12 @@ class GoldenTestEvaluator
         $now = microtime(true);
         $minGap = 21.0; // 3 RPM = 20s, use 21s to be safe
         $sleep = $minGap - ($now - $this->lastCallAt);
-        
+
         if ($sleep > 0) {
-            echo "⏳ Waiting " . round($sleep, 1) . " seconds to respect 3 RPM limit...\n";
-            usleep((int)($sleep * 1_000_000));
+            echo '⏳ Waiting '.round($sleep, 1)." seconds to respect 3 RPM limit...\n";
+            usleep((int) ($sleep * 1_000_000));
         }
-        
+
         $this->lastCallAt = microtime(true);
     }
 
@@ -65,7 +70,7 @@ class GoldenTestEvaluator
 
         // Load expected results
         $expectedResults = $this->loadExpectedResults();
-        
+
         // Run each test case with proper Free tier pacing
         foreach ($expectedResults as $index => $testCase) {
             if ($index > 0) {
@@ -85,9 +90,9 @@ class GoldenTestEvaluator
      */
     private function loadExpectedResults(): array
     {
-        $expectedFile = __DIR__ . '/../golden/expected.json';
-        
-        if (!file_exists($expectedFile)) {
+        $expectedFile = __DIR__.'/../golden/expected.json';
+
+        if (! file_exists($expectedFile)) {
             throw new Exception("Expected results file not found: {$expectedFile}");
         }
 
@@ -95,7 +100,7 @@ class GoldenTestEvaluator
         $expected = json_decode($content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception("Invalid JSON in expected results: " . json_last_error_msg());
+            throw new Exception('Invalid JSON in expected results: '.json_last_error_msg());
         }
 
         return $expected;
@@ -107,7 +112,7 @@ class GoldenTestEvaluator
     private function runTestCase(array $testCase): void
     {
         $this->totalTests++;
-        
+
         echo "🔍 Testing: {$testCase['name']}\n";
         echo "   CV: {$testCase['cv_file']}\n";
         echo "   Job: {$testCase['job_file']}\n";
@@ -116,7 +121,7 @@ class GoldenTestEvaluator
             // Load CV text and job description with truncation
             $cvText = $this->loadCvText($testCase['cv_file']);
             $jobDescription = $this->loadJobDescription($testCase['job_file']);
-            
+
             // Truncate inputs aggressively for Free tier (≤2k tokens input)
             $cvText = OpenAIClient::safeTruncate($cvText, 15000); // ~12-15k chars
             $jobDescription = OpenAIClient::safeTruncate($jobDescription, 5000); // ~3-5k chars
@@ -125,27 +130,27 @@ class GoldenTestEvaluator
             $messages = [
                 [
                     'role' => 'system',
-                    'content' => 'Return ONLY valid JSON with keys cover_letter, build_summary. Do not invent facts not in CV.'
+                    'content' => 'Return ONLY valid JSON with keys cover_letter, build_summary. Do not invent facts not in CV.',
                 ],
                 [
                     'role' => 'user',
-                    'content' => OpenAIClient::buildPrompt($cvText, $jobDescription)
-                ]
+                    'content' => OpenAIClient::buildPrompt($cvText, $jobDescription),
+                ],
             ];
 
             $response = $this->openaiClient->chat($messages, 0.5);
             $json = json_decode($response, true);
-            
-            if (!is_array($json) || !isset($json['cover_letter'])) {
+
+            if (! is_array($json) || ! isset($json['cover_letter'])) {
                 $json = OpenAIClient::tryRepairJson($response);
             }
-            
+
             $coverLetter = $json['cover_letter'] ?? '';
             $wordCount = str_word_count($coverLetter);
-            
+
             $result = [
                 'cover_letter' => $coverLetter,
-                'word_count' => $wordCount
+                'word_count' => $wordCount,
             ];
 
             // Validate results
@@ -167,7 +172,7 @@ class GoldenTestEvaluator
                 'errors' => $validationResult['errors'],
                 'word_count' => $result['word_count'] ?? 0,
                 'company_mentioned' => $validationResult['company_mentioned'] ?? false,
-                'banned_phrases_found' => $validationResult['banned_phrases_found'] ?? []
+                'banned_phrases_found' => $validationResult['banned_phrases_found'] ?? [],
             ];
 
         } catch (Exception $e) {
@@ -178,7 +183,7 @@ class GoldenTestEvaluator
                 'errors' => ["Exception: {$e->getMessage()}"],
                 'word_count' => 0,
                 'company_mentioned' => false,
-                'banned_phrases_found' => []
+                'banned_phrases_found' => [],
             ];
         }
 
@@ -191,16 +196,16 @@ class GoldenTestEvaluator
     private function loadCvText(string $filename): string
     {
         // Try to load from text file first (for testing)
-        $textPath = __DIR__ . "/../golden/cvs/" . str_replace('.pdf', '.txt', $filename);
-        
+        $textPath = __DIR__.'/../golden/cvs/'.str_replace('.pdf', '.txt', $filename);
+
         if (file_exists($textPath)) {
             return file_get_contents($textPath);
         }
-        
+
         // Fallback to PDF extraction (requires pdftotext)
-        $pdfPath = __DIR__ . "/../golden/cvs/{$filename}";
-        
-        if (!file_exists($pdfPath)) {
+        $pdfPath = __DIR__."/../golden/cvs/{$filename}";
+
+        if (! file_exists($pdfPath)) {
             throw new Exception("CV file not found: {$pdfPath}");
         }
 
@@ -211,7 +216,7 @@ class GoldenTestEvaluator
             null,
             true
         );
-        
+
         return $this->pdfExtractor->extract($cvFile);
     }
 
@@ -220,9 +225,9 @@ class GoldenTestEvaluator
      */
     private function loadJobDescription(string $filename): string
     {
-        $jobPath = __DIR__ . "/../golden/jobs/{$filename}";
-        
-        if (!file_exists($jobPath)) {
+        $jobPath = __DIR__."/../golden/jobs/{$filename}";
+
+        if (! file_exists($jobPath)) {
             throw new Exception("Job description file not found: {$jobPath}");
         }
 
@@ -254,8 +259,8 @@ class GoldenTestEvaluator
             }
         }
 
-        if (!$companyMentioned) {
-            $errors[] = "Company/role not mentioned. Expected one of: " . implode(', ', $expected['must_mention']);
+        if (! $companyMentioned) {
+            $errors[] = 'Company/role not mentioned. Expected one of: '.implode(', ', $expected['must_mention']);
             $passed = false;
         }
 
@@ -273,7 +278,7 @@ class GoldenTestEvaluator
             'passed' => $passed,
             'errors' => $errors,
             'company_mentioned' => $companyMentioned,
-            'banned_phrases_found' => $bannedPhrasesFound
+            'banned_phrases_found' => $bannedPhrasesFound,
         ];
     }
 
@@ -286,8 +291,8 @@ class GoldenTestEvaluator
         echo "==============\n";
         echo "Total Tests: {$this->totalTests}\n";
         echo "Passed: {$this->passedTests}\n";
-        echo "Failed: " . ($this->totalTests - $this->passedTests) . "\n";
-        echo "Success Rate: " . round(($this->passedTests / $this->totalTests) * 100, 1) . "%\n\n";
+        echo 'Failed: '.($this->totalTests - $this->passedTests)."\n";
+        echo 'Success Rate: '.round(($this->passedTests / $this->totalTests) * 100, 1)."%\n\n";
 
         if ($this->passedTests === $this->totalTests) {
             echo "🎉 All tests passed! The cover letter generator is working correctly.\n";
@@ -300,7 +305,7 @@ class GoldenTestEvaluator
         foreach ($this->testResults as $result) {
             $status = $result['passed'] ? '✅' : '❌';
             echo "{$status} {$result['name']} - {$result['word_count']} words\n";
-            if (!$result['passed']) {
+            if (! $result['passed']) {
                 foreach ($result['errors'] as $error) {
                     echo "   - {$error}\n";
                 }
@@ -311,9 +316,9 @@ class GoldenTestEvaluator
 
 // Run the evaluation
 try {
-    $evaluator = new GoldenTestEvaluator();
+    $evaluator = new GoldenTestEvaluator;
     $allPassed = $evaluator->runAllTests();
-    
+
     exit($allPassed ? 0 : 1);
 } catch (Exception $e) {
     echo "💥 Fatal Error: {$e->getMessage()}\n";

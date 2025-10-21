@@ -32,20 +32,22 @@ class GenerateCoverLetterRequest extends FormRequest
                     $finfo = finfo_open(FILEINFO_MIME_TYPE);
                     if ($finfo === false) {
                         $fail('Unable to validate file type.');
+
                         return;
                     }
                     $mimeType = finfo_file($finfo, $value->getPathname());
                     if ($mimeType !== 'application/pdf') {
                         $fail('File must be a valid PDF.');
                     }
-                }
+                },
             ],
-            'job_description' => 'required|string|min:50|max:10000'
+            'job_description' => 'required|string|min:50|max:10000',
         ];
     }
 
     /**
      * Get custom error messages for validation rules.
+     *
      * @return array<string, string>
      */
     public function messages(): array
@@ -71,9 +73,9 @@ class GenerateCoverLetterRequest extends FormRequest
             'error' => [
                 'message' => 'Validation failed.',
                 'code' => 'VALIDATION_ERROR',
-                'request_id' => uniqid('req_', true)
+                'request_id' => uniqid('req_', true),
             ],
-            'errors' => $validator->errors()
+            'errors' => $validator->errors(),
         ], 422);
 
         throw new \Illuminate\Validation\ValidationException($validator, $response);

@@ -1,61 +1,133 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# CV Cover Letter Generator
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://github.com/geraldsadya/clover/actions"><img src="https://github.com/geraldsadya/clover/workflows/CI%20Pipeline/badge.svg" alt="Build Status"></a>
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+An AI-powered web application that generates tailored cover letters from PDF CVs and job descriptions using Laravel 11 and Azure OpenAI.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **PDF CV Processing**: Extract text from PDF files with validation
+- **AI-Powered Generation**: Two-stage pipeline for accurate, non-hallucinated cover letters
+- **Anti-Hallucination**: Golden test set ensures AI doesn't invent facts not in CV
+- **Modern UI**: Responsive design with Alpine.js and accessibility features
+- **Production Ready**: PHPStan level 8, security headers, rate limiting
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Tech Stack
 
-## Learning Laravel
+- **Backend**: Laravel 11, PHP 8.2+
+- **AI**: Azure OpenAI (GPT-4.1)
+- **Frontend**: Blade templates, Alpine.js, Tailwind CSS
+- **Testing**: PHPUnit, Golden Test Set
+- **Quality**: PHPStan level 8, Laravel Pint
+- **CI/CD**: GitHub Actions
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Installation
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+1. Clone the repository:
+```bash
+git clone https://github.com/geraldsadya/clover.git
+cd clover/cover-letter-app
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. Install dependencies:
+```bash
+composer install
+```
 
-## Laravel Sponsors
+3. Set up environment:
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+4. Configure OpenAI API:
+```bash
+# Add your Azure OpenAI credentials to .env
+OPENAI_API_KEY=your_api_key
+OPENAI_BASE=https://your-resource.openai.azure.com/
+MODEL=gpt-4.1
+```
 
-### Premium Partners
+5. Run migrations:
+```bash
+php artisan migrate
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+6. Start the development server:
+```bash
+php artisan serve
+```
+
+## Usage
+
+1. Upload a PDF CV
+2. Paste the job description
+3. Click "Generate Cover Letter"
+4. Copy the generated cover letter
+
+## Development
+
+### Running Tests
+
+```bash
+# Run all tests
+php artisan test
+
+# Run static analysis
+./vendor/bin/phpstan analyse app/ --level=8
+
+# Run code style check
+./vendor/bin/pint --test
+
+# Run golden test set
+php scripts/eval.php
+```
+
+### CI/CD
+
+The project uses GitHub Actions for continuous integration:
+
+- **Tests**: PHPUnit test suite
+- **Static Analysis**: PHPStan level 8
+- **Code Style**: Laravel Pint
+- **Golden Tests**: Anti-hallucination validation
+- **Security**: Composer audit
+
+## Architecture
+
+### Two-Stage AI Pipeline
+
+1. **Facts Extraction**: Extract structured facts from CV text
+2. **Cover Letter Composition**: Generate cover letter using only extracted facts
+
+This prevents AI hallucinations and ensures accuracy.
+
+### Golden Test Set
+
+Comprehensive test suite with 5 CV/Job pairs that validates:
+- Word count (150-300 words)
+- Company/role mentions
+- No banned phrases (anti-hallucination)
+
+## Security
+
+- Rate limiting (10 requests/hour per IP)
+- Security headers (CSP, HSTS, X-Frame-Options)
+- POPIA compliance
+- No PII in logs
+- File validation (PDF only, 10MB max)
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and static analysis
+5. Submit a pull request
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

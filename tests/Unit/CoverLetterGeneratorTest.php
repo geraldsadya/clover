@@ -4,9 +4,8 @@ namespace Tests\Unit;
 
 use App\Services\CoverLetterGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Illuminate\Support\Facades\Log;
 use Mockery;
+use Tests\TestCase;
 
 class CoverLetterGeneratorTest extends TestCase
 {
@@ -17,7 +16,7 @@ class CoverLetterGeneratorTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->generator = new CoverLetterGenerator();
+        $this->generator = new CoverLetterGenerator;
     }
 
     /**
@@ -33,18 +32,18 @@ class CoverLetterGeneratorTest extends TestCase
                 [
                     'company' => 'Tech Corp',
                     'role' => 'Senior Developer',
-                    'duration' => '2020-2023'
-                ]
+                    'duration' => '2020-2023',
+                ],
             ],
             'education' => [
                 [
                     'institution' => 'University of Tech',
                     'degree' => 'Computer Science',
-                    'year' => '2018'
-                ]
+                    'year' => '2018',
+                ],
             ],
             'certifications' => ['AWS Certified'],
-            'years_of_experience' => 5
+            'years_of_experience' => 5,
         ];
 
         // Use reflection to test private method
@@ -92,7 +91,7 @@ class CoverLetterGeneratorTest extends TestCase
             'education' => [],
             'certifications' => [],
             'years_of_experience' => 3,
-            'note' => 'Experience not specified' // Banned phrase
+            'note' => 'Experience not specified', // Banned phrase
         ];
 
         // Use reflection to test private method
@@ -118,18 +117,18 @@ class CoverLetterGeneratorTest extends TestCase
                 [
                     'company' => 'Tech Corp',
                     'role' => 'Senior Developer',
-                    'duration' => '2020-2023'
-                ]
+                    'duration' => '2020-2023',
+                ],
             ],
             'education' => [
                 [
                     'institution' => 'University of Tech',
                     'degree' => 'Computer Science',
-                    'year' => '2018'
-                ]
+                    'year' => '2018',
+                ],
             ],
             'certifications' => ['AWS Certified'],
-            'years_of_experience' => 5
+            'years_of_experience' => 5,
         ];
 
         // Use reflection to test private method
@@ -153,7 +152,7 @@ class CoverLetterGeneratorTest extends TestCase
             'experience' => [],
             'education' => [],
             'certifications' => [],
-            'years_of_experience' => 3
+            'years_of_experience' => 3,
         ]);
 
         // Use reflection to test private method
@@ -162,7 +161,7 @@ class CoverLetterGeneratorTest extends TestCase
         $method->setAccessible(true);
 
         $result = $method->invoke($this->generator, $validJson);
-        
+
         $this->assertIsArray($result);
         $this->assertEquals('John Doe', $result['name']);
         $this->assertEquals(3, $result['years_of_experience']);
@@ -173,14 +172,14 @@ class CoverLetterGeneratorTest extends TestCase
      */
     public function it_handles_markdown_formatted_responses()
     {
-        $markdownJson = '```json' . "\n" . json_encode([
+        $markdownJson = '```json'."\n".json_encode([
             'name' => 'John Doe',
             'skills' => ['PHP'],
             'experience' => [],
             'education' => [],
             'certifications' => [],
-            'years_of_experience' => 3
-        ]) . "\n```";
+            'years_of_experience' => 3,
+        ])."\n```";
 
         // Use reflection to test private method
         $reflection = new \ReflectionClass($this->generator);
@@ -188,7 +187,7 @@ class CoverLetterGeneratorTest extends TestCase
         $method->setAccessible(true);
 
         $result = $method->invoke($this->generator, $markdownJson);
-        
+
         $this->assertIsArray($result);
         $this->assertEquals('John Doe', $result['name']);
     }
@@ -221,7 +220,7 @@ class CoverLetterGeneratorTest extends TestCase
             'experience' => [],
             'education' => [],
             'certifications' => [],
-            'years_of_experience' => 100 // Invalid range
+            'years_of_experience' => 100, // Invalid range
         ];
 
         // Use reflection to test private method
@@ -239,15 +238,15 @@ class CoverLetterGeneratorTest extends TestCase
      */
     public function it_builds_extraction_prompt_correctly()
     {
-        $cvText = "John Doe is a developer with PHP skills.";
-        
+        $cvText = 'John Doe is a developer with PHP skills.';
+
         // Use reflection to test private method
         $reflection = new \ReflectionClass($this->generator);
         $method = $reflection->getMethod('buildExtractionPrompt');
         $method->setAccessible(true);
 
         $prompt = $method->invoke($this->generator, $cvText, 0);
-        
+
         $this->assertStringContainsString('Extract the following information', $prompt);
         $this->assertStringContainsString('name', $prompt);
         $this->assertStringContainsString('skills', $prompt);
@@ -263,15 +262,15 @@ class CoverLetterGeneratorTest extends TestCase
      */
     public function it_builds_stricter_prompt_on_retry()
     {
-        $cvText = "John Doe is a developer with PHP skills.";
-        
+        $cvText = 'John Doe is a developer with PHP skills.';
+
         // Use reflection to test private method
         $reflection = new \ReflectionClass($this->generator);
         $method = $reflection->getMethod('buildExtractionPrompt');
         $method->setAccessible(true);
 
         $retryPrompt = $method->invoke($this->generator, $cvText, 1);
-        
+
         $this->assertStringContainsString('IMPORTANT: This is a retry attempt', $retryPrompt);
         $this->assertStringContainsString('perfectly valid', $retryPrompt);
     }
@@ -282,9 +281,9 @@ class CoverLetterGeneratorTest extends TestCase
     public function it_strips_html_tags_from_job_description()
     {
         $jobDescription = '<h1>Software Engineer</h1><p>We are looking for a <strong>talented</strong> developer with <em>PHP</em> skills.</p><ul><li>Laravel experience</li></ul>';
-        
+
         $result = $this->generator->sanitizeJobDescription($jobDescription);
-        
+
         $this->assertEquals('Software EngineerWe are looking for a talented developer with PHP skills.Laravel experience', $result);
         $this->assertStringNotContainsString('<h1>', $result);
         $this->assertStringNotContainsString('<p>', $result);
@@ -300,9 +299,9 @@ class CoverLetterGeneratorTest extends TestCase
     public function it_removes_utm_tracking_parameters()
     {
         $jobDescription = 'Software Engineer position https://company.com/jobs?utm_source=linkedin&utm_medium=social&utm_campaign=recruitment&other=param';
-        
+
         $result = $this->generator->sanitizeJobDescription($jobDescription);
-        
+
         $this->assertStringNotContainsString('utm_source', $result);
         $this->assertStringNotContainsString('utm_medium', $result);
         $this->assertStringNotContainsString('utm_campaign', $result);
@@ -315,9 +314,9 @@ class CoverLetterGeneratorTest extends TestCase
     public function it_removes_other_tracking_parameters()
     {
         $jobDescription = 'Software Engineer position https://company.com/jobs?fbclid=123&gclid=456&msclkid=789&normal=param';
-        
+
         $result = $this->generator->sanitizeJobDescription($jobDescription);
-        
+
         $this->assertStringNotContainsString('fbclid=123', $result);
         $this->assertStringNotContainsString('gclid=456', $result);
         $this->assertStringNotContainsString('msclkid=789', $result);
@@ -330,9 +329,9 @@ class CoverLetterGeneratorTest extends TestCase
     public function it_normalizes_whitespace()
     {
         $jobDescription = "Software   Engineer\n\n\nPosition\r\n\r\nWith\t\t\tMultiple    Spaces";
-        
+
         $result = $this->generator->sanitizeJobDescription($jobDescription);
-        
+
         $this->assertEquals('Software Engineer Position With Multiple Spaces', $result);
         $this->assertStringNotContainsString('   ', $result); // No multiple spaces
         $this->assertStringNotContainsString("\n", $result); // No newlines
@@ -346,9 +345,9 @@ class CoverLetterGeneratorTest extends TestCase
     public function it_caps_length_to_10k_chars()
     {
         $longJobDescription = str_repeat('Software Engineer position. ', 1000); // ~30k chars
-        
+
         $result = $this->generator->sanitizeJobDescription($longJobDescription);
-        
+
         $this->assertLessThanOrEqual(10000, strlen($result));
         $this->assertGreaterThan(9000, strlen($result)); // Should be close to 10k
     }
@@ -359,9 +358,9 @@ class CoverLetterGeneratorTest extends TestCase
     public function it_does_not_cut_off_words_when_capping_length()
     {
         $longJobDescription = str_repeat('Software Engineer position. ', 1000); // ~30k chars
-        
+
         $result = $this->generator->sanitizeJobDescription($longJobDescription);
-        
+
         // Should not end with a partial word
         $this->assertStringEndsWith('.', $result);
         // Should be close to 10k characters
@@ -374,7 +373,7 @@ class CoverLetterGeneratorTest extends TestCase
     public function it_handles_empty_job_description()
     {
         $result = $this->generator->sanitizeJobDescription('');
-        
+
         $this->assertEquals('', $result);
     }
 
@@ -384,9 +383,9 @@ class CoverLetterGeneratorTest extends TestCase
     public function it_handles_job_description_with_only_html()
     {
         $jobDescription = '<div><span></span></div>';
-        
+
         $result = $this->generator->sanitizeJobDescription($jobDescription);
-        
+
         $this->assertEquals('', $result);
     }
 
@@ -396,9 +395,9 @@ class CoverLetterGeneratorTest extends TestCase
     public function it_handles_job_description_with_mixed_content()
     {
         $jobDescription = '<h1>Software Engineer</h1>We need someone with <strong>PHP</strong> skills. https://company.com?utm_source=linkedin&normal=param';
-        
+
         $result = $this->generator->sanitizeJobDescription($jobDescription);
-        
+
         $this->assertEquals('Software EngineerWe need someone with PHP skills. https://company.com&normal=param', $result);
         $this->assertStringNotContainsString('<h1>', $result);
         $this->assertStringNotContainsString('<strong>', $result);
@@ -412,9 +411,9 @@ class CoverLetterGeneratorTest extends TestCase
     public function it_trims_whitespace()
     {
         $jobDescription = '   Software Engineer position   ';
-        
+
         $result = $this->generator->sanitizeJobDescription($jobDescription);
-        
+
         $this->assertEquals('Software Engineer position', $result);
         $this->assertFalse(str_starts_with($result, ' '));
         $this->assertFalse(str_ends_with($result, ' '));
@@ -432,18 +431,18 @@ class CoverLetterGeneratorTest extends TestCase
                 [
                     'company' => 'TechCorp',
                     'role' => 'Senior Developer',
-                    'duration' => '2020-2023'
-                ]
+                    'duration' => '2020-2023',
+                ],
             ],
             'education' => [
                 [
                     'institution' => 'University of Tech',
                     'degree' => 'Computer Science',
-                    'year' => '2018'
-                ]
+                    'year' => '2018',
+                ],
             ],
             'certifications' => ['AWS Certified'],
-            'years_of_experience' => 5
+            'years_of_experience' => 5,
         ];
 
         $jobDescription = 'Software Engineer position at TechCorp. We are looking for a talented developer with PHP skills.';
@@ -456,7 +455,7 @@ class CoverLetterGeneratorTest extends TestCase
         $sampleCoverLetter = "Dear Hiring Manager,\n\nI am writing to express my strong interest in the Software Engineer position at TechCorp. With 5 years of experience in software development and expertise in PHP, Laravel, and JavaScript, I am confident that I would be a valuable addition to your team. My technical skills align perfectly with your requirements, and I am excited about the opportunity to contribute to your innovative projects.\n\nDuring my time as a Senior Developer at TechCorp, I have consistently delivered high-quality solutions and demonstrated strong problem-solving abilities. My AWS Certified credentials and Computer Science degree from University of Tech have provided me with a solid foundation for tackling complex technical challenges. I have successfully led development teams and implemented scalable architectures that improved system performance by 40%.\n\nI am excited about the opportunity to contribute to TechCorp's continued success and would welcome the chance to discuss how my skills and experience align with your needs. Thank you for considering my application.\n\nSincerely,\nJohn Doe";
 
         $result = $method->invoke($this->generator, $sampleCoverLetter, $facts);
-        
+
         $this->assertIsString($result);
         $this->assertGreaterThanOrEqual(150, str_word_count($result));
         $this->assertLessThanOrEqual(300, str_word_count($result));
@@ -473,10 +472,10 @@ class CoverLetterGeneratorTest extends TestCase
             'experience' => [],
             'education' => [],
             'certifications' => [],
-            'years_of_experience' => 3
+            'years_of_experience' => 3,
         ];
 
-        $shortCoverLetter = "Dear Hiring Manager, I am interested in the position. Best regards, John Doe";
+        $shortCoverLetter = 'Dear Hiring Manager, I am interested in the position. Best regards, John Doe';
 
         // Use reflection to test private method
         $reflection = new \ReflectionClass($this->generator);
@@ -499,10 +498,10 @@ class CoverLetterGeneratorTest extends TestCase
             'experience' => [],
             'education' => [],
             'certifications' => [],
-            'years_of_experience' => 3
+            'years_of_experience' => 3,
         ];
 
-        $longCoverLetter = str_repeat("This is a very long sentence that will make the cover letter exceed the word count limit. ", 50);
+        $longCoverLetter = str_repeat('This is a very long sentence that will make the cover letter exceed the word count limit. ', 50);
 
         // Use reflection to test private method
         $reflection = new \ReflectionClass($this->generator);
@@ -525,10 +524,10 @@ class CoverLetterGeneratorTest extends TestCase
             'experience' => [],
             'education' => [],
             'certifications' => [],
-            'years_of_experience' => 3
+            'years_of_experience' => 3,
         ];
 
-        $coverLetterWithHallucination = "Dear Hiring Manager, I have extensive experience with PHP, Laravel, and Docker. Best regards, John Doe";
+        $coverLetterWithHallucination = 'Dear Hiring Manager, I have extensive experience with PHP, Laravel, and Docker. Best regards, John Doe';
 
         // Use reflection to test private method
         $reflection = new \ReflectionClass($this->generator);
@@ -551,10 +550,10 @@ class CoverLetterGeneratorTest extends TestCase
             'experience' => [],
             'education' => [],
             'certifications' => [],
-            'years_of_experience' => 3
+            'years_of_experience' => 3,
         ];
 
-        $coverLetterWithValidSkills = "Dear Hiring Manager, I have extensive experience with PHP, Laravel, and Docker. Best regards, John Doe";
+        $coverLetterWithValidSkills = 'Dear Hiring Manager, I have extensive experience with PHP, Laravel, and Docker. Best regards, John Doe';
 
         // Use reflection to test private method
         $reflection = new \ReflectionClass($this->generator);
@@ -579,7 +578,7 @@ class CoverLetterGeneratorTest extends TestCase
         $method->setAccessible(true);
 
         $result = $method->invoke($this->generator, $jobDescription);
-        
+
         $this->assertIsArray($result);
         $this->assertArrayHasKey('company', $result);
         $this->assertArrayHasKey('role', $result);
@@ -598,9 +597,9 @@ class CoverLetterGeneratorTest extends TestCase
             'experience' => [],
             'education' => [],
             'certifications' => [],
-            'years_of_experience' => 3
+            'years_of_experience' => 3,
         ];
-        
+
         $jobDescription = 'Software Engineer at TechCorp';
         $companyAndRole = ['company' => 'TechCorp', 'role' => 'Software Engineer'];
 
@@ -610,7 +609,7 @@ class CoverLetterGeneratorTest extends TestCase
         $method->setAccessible(true);
 
         $prompt = $method->invoke($this->generator, $facts, $jobDescription, $companyAndRole, 0);
-        
+
         $this->assertStringContainsString('Software Engineer at TechCorp', $prompt);
         $this->assertStringContainsString('150-300 words', $prompt);
         $this->assertStringContainsString('2-3 paragraphs', $prompt);
@@ -629,9 +628,9 @@ class CoverLetterGeneratorTest extends TestCase
             'experience' => [],
             'education' => [],
             'certifications' => [],
-            'years_of_experience' => 3
+            'years_of_experience' => 3,
         ];
-        
+
         $jobDescription = 'Software Engineer at TechCorp';
         $companyAndRole = ['company' => 'TechCorp', 'role' => 'Software Engineer'];
 
@@ -641,7 +640,7 @@ class CoverLetterGeneratorTest extends TestCase
         $method->setAccessible(true);
 
         $retryPrompt = $method->invoke($this->generator, $facts, $jobDescription, $companyAndRole, 1);
-        
+
         $this->assertStringContainsString('IMPORTANT: This is a retry attempt', $retryPrompt);
         $this->assertStringContainsString('150-300 words', $retryPrompt);
     }
@@ -657,10 +656,10 @@ class CoverLetterGeneratorTest extends TestCase
             'experience' => [],
             'education' => [],
             'certifications' => [],
-            'years_of_experience' => 3
+            'years_of_experience' => 3,
         ];
 
-        $markdownCoverLetter = '```' . "\n" . str_repeat("This is a properly formatted cover letter with sufficient word count. ", 25) . "\n```";
+        $markdownCoverLetter = '```'."\n".str_repeat('This is a properly formatted cover letter with sufficient word count. ', 25)."\n```";
 
         // Use reflection to test private method
         $reflection = new \ReflectionClass($this->generator);
@@ -668,7 +667,7 @@ class CoverLetterGeneratorTest extends TestCase
         $method->setAccessible(true);
 
         $result = $method->invoke($this->generator, $markdownCoverLetter, $facts);
-        
+
         $this->assertIsString($result);
         $this->assertStringNotContainsString('```', $result);
         $this->assertGreaterThanOrEqual(150, str_word_count($result));

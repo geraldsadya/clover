@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 class OpenAIClient
 {
     private Client $http;
-    private string $model;
+
     private string $apiKey;
 
     public function __construct()
@@ -19,23 +19,25 @@ class OpenAIClient
         if (str_contains($baseUrl, 'openai.azure.com')) {
             // Azure OpenAI format: https://your-resource.openai.azure.com/openai/deployments/your-deployment
             $this->http = new Client([
-                'base_uri' => $baseUrl . '/',
+                'base_uri' => $baseUrl.'/',
                 'timeout' => 60,
             ]);
         } else {
             // Standard OpenAI format
             $this->http = new Client([
-                'base_uri' => $baseUrl . '/v1/',
+                'base_uri' => $baseUrl.'/v1/',
                 'timeout' => 60,
             ]);
         }
-        
-        $this->model = env('MODEL', 'gpt-4o-mini');
+
         $this->apiKey = env('OPENAI_API_KEY');
     }
 
     /**
      * Make a chat completion request with exponential backoff retry
+     */
+    /**
+     * @param  array<int, array{role: string, content: string}>  $messages
      */
     public function chat(array $messages, float $temperature = 0.5, int $maxRetries = 6): string
     {
@@ -46,9 +48,9 @@ class OpenAIClient
             try {
                 // Azure OpenAI uses different endpoint format
                 $baseUrl = env('OPENAI_BASE', 'https://api.openai.com');
-                if (str_contains($baseUrl, 'openai.azure.com')) {
-                    // Azure format: https://resource.openai.azure.com/openai/deployments/deployment/chat/completions?api-version=2024-10-21
-                    $endpoint = $baseUrl . '/chat/completions?api-version=2024-10-21';
+                if (str_contains($baseUrl, 'cognitiveservices.azure.com') || str_contains($baseUrl, 'openai.azure.com')) {
+                    // Azure format: https://resource.cognitiveservices.azure.com/openai/deployments/deployment/chat/completions?api-version=2024-12-01-preview
+                    $endpoint = $baseUrl.'/chat/completions?api-version=2024-12-01-preview';
                     $headers = [
                         'api-key' => $this->apiKey,
                         'Content-Type' => 'application/json',
@@ -57,7 +59,7 @@ class OpenAIClient
                     // Standard OpenAI format
                     $endpoint = 'chat/completions';
                     $headers = [
-                        'Authorization' => 'Bearer ' . $this->apiKey,
+                        'Authorization' => 'Bearer '.$this->apiKey,
                         'Content-Type' => 'application/json',
                     ];
                 }
@@ -65,6 +67,7 @@ class OpenAIClient
                 $response = $this->http->post($endpoint, [
                     'headers' => $headers,
                     'json' => [
+                        'model' => env('MODEL', 'gpt-4o-mini'),
                         'messages' => $messages,
                         'temperature' => $temperature,
                         'max_tokens' => 300, // Keep output small for Free tier
@@ -72,7 +75,7 @@ class OpenAIClient
                     'timeout' => 60,
                 ]);
 
-                $data = json_decode((string)$response->getBody(), true);
+                $data = json_decode((string) $response->getBody(), true);
                 $content = $data['choices'][0]['message']['content'] ?? '';
 
                 if (empty($content)) {
@@ -92,12 +95,12 @@ class OpenAIClient
                     'error' => $e->getMessage(),
                 ]);
 
-                if (!$retryable || $attempt >= $maxRetries) {
-                    throw new \Exception("OpenAI API request failed after {$maxRetries} retries: " . $e->getMessage());
+                if (! $retryable || $attempt >= $maxRetries) {
+                    throw new \Exception("OpenAI API request failed after {$maxRetries} retries: ".$e->getMessage());
                 }
 
                 // Honor Retry-After header if present
-                $retryAfter = (int)($e->getResponse()?->getHeaderLine('Retry-After') ?? 0);
+                $retryAfter = (int) ($e->getResponse()?->getHeaderLine('Retry-After') ?? 0);
                 if ($retryAfter > 0) {
                     sleep($retryAfter);
                 } else {
@@ -116,8 +119,9 @@ class OpenAIClient
      */
     public static function safeTruncate(string $text, int $maxChars): string
     {
-        $text = preg_replace('/\s+/', ' ', $text ?? '');
-        return mb_substr($text, 0, $maxChars);
+        $cleaned = preg_replace('/\s+/', ' ', $text);
+
+        return mb_substr($cleaned ?? '', 0, $maxChars);
     }
 
     /**
@@ -142,14 +146,50 @@ PROMPT;
     /**
      * Try to repair malformed JSON response
      */
+    /**
+     * @return array{cover_letter: string, build_summary: string}
+     */
     public static function tryRepairJson(string $response): array
     {
-        if (preg_match('/\{.*\}/s', $response, $matches)) {
+        // First try to clean the response
+        $cleaned = trim($response);
+
+        // Try direct decode first
+        $json = json_decode($cleaned, true);
+        if (is_array($json) && isset($json['cover_letter'], $json['build_summary'])) {
+            return $json;
+        }
+
+        // Try to extract JSON using regex
+        if (preg_match('/\{.*\}/s', $cleaned, $matches)) {
             $json = json_decode($matches[0], true);
             if (is_array($json) && isset($json['cover_letter'], $json['build_summary'])) {
                 return $json;
             }
         }
-        return ['cover_letter' => '', 'build_summary' => ''];
+
+        // Simple approach: extract fields using basic string operations
+        $coverLetter = '';
+        $buildSummary = '';
+
+        // Find cover_letter field
+        if (preg_match('/"cover_letter":\s*"([^"]*(?:\\.[^"]*)*)"/s', $cleaned, $matches)) {
+            $coverLetter = $matches[1];
+            // Unescape JSON strings
+            $coverLetter = str_replace(['\\n', '\\"', '\\\\'], ["\n", '"', '\\'], $coverLetter);
+        }
+
+        // Find build_summary field
+        if (preg_match('/"build_summary":\s*"([^"]*(?:\\.[^"]*)*)"/s', $cleaned, $matches)) {
+            $buildSummary = $matches[1];
+            // Unescape JSON strings
+            $buildSummary = str_replace(['\\n', '\\"', '\\\\'], ["\n", '"', '\\'], $buildSummary);
+        }
+
+        // Return the extracted content
+        return [
+            'cover_letter' => $coverLetter,
+            'build_summary' => $buildSummary,
+        ];
     }
 }

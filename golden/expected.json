@@ -15,7 +15,7 @@
         "word_count_min": 150,
         "word_count_max": 300,
         "must_mention": ["Laravel", "PHP", "backend", "Silvertreebrands"],
-        "banned_phrases": ["React", "Vue", "frontend", "CSS", "JavaScript"]
+        "banned_phrases": ["React", "Vue", "CSS", "JavaScript", "frontend development", "frontend technologies"]
     },
     {
         "name": "Career Changer",
