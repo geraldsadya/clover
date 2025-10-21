@@ -1,0 +1,113 @@
+%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 612 792]
+/Contents 4 0 R
+/Resources <<
+/Font <<
+/F1 5 0 R
+>>
+>>
+>>
+endobj
+
+4 0 obj
+<<
+/Length 2400
+>>
+stream
+BT
+/F1 12 Tf
+50 750 Td
+(David Kim) Tj
+0 -20 Td
+(DevOps Engineer & Kubernetes Specialist) Tj
+0 -20 Td
+(david.kim@email.com | +1-555-0654) Tj
+0 -40 Td
+(EXPERIENCE) Tj
+0 -20 Td
+(Senior DevOps Engineer - CloudTech Solutions | 2020-2024) Tj
+0 -15 Td
+(- Designed and implemented Kubernetes clusters for microservices) Tj
+0 -15 Td
+(- Automated CI/CD pipelines using Jenkins and GitLab) Tj
+0 -15 Td
+(- Managed infrastructure as code with Terraform and Ansible) Tj
+0 -15 Td
+(- Implemented monitoring and logging with Prometheus and ELK) Tj
+0 -20 Td
+(DevOps Engineer - StartupScale | 2018-2020) Tj
+0 -15 Td
+(- Containerized applications using Docker and Kubernetes) Tj
+0 -15 Td
+(- Set up automated deployment pipelines) Tj
+0 -15 Td
+(- Managed cloud infrastructure on AWS and Azure) Tj
+0 -40 Td
+(CERTIFICATIONS) Tj
+0 -20 Td
+(- Certified Kubernetes Administrator (CKA)) Tj
+0 -15 Td
+(- AWS Certified Solutions Architect) Tj
+0 -15 Td
+(- Docker Certified Associate) Tj
+0 -40 Td
+(SKILLS) Tj
+0 -20 Td
+(- Kubernetes, Docker, Jenkins, GitLab CI/CD) Tj
+0 -15 Td
+(- Terraform, Ansible, AWS, Azure) Tj
+0 -15 Td
+(- Prometheus, Grafana, ELK Stack) Tj
+0 -40 Td
+(EDUCATION) Tj
+0 -20 Td
+(Bachelor of Science in Computer Engineering) Tj
+0 -15 Td
+(Tech Institute | 2014-2018) Tj
+ET
+endstream
+endobj
+
+5 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/BaseFont /Helvetica
+>>
+endobj
+
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000274 00000 n 
+0000002740 00000 n 
+trailer
+<<
+/Size 6
+/Root 1 0 R
+>>
+startxref
+2817
+%%EOF

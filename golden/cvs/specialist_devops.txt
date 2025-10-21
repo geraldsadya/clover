@@ -1,0 +1,29 @@
+David Kim
+DevOps Engineer & Kubernetes Specialist
+david.kim@email.com | +1-555-0654
+
+EXPERIENCE
+Senior DevOps Engineer - CloudTech Solutions | 2020-2024
+- Designed and implemented Kubernetes clusters for microservices
+- Automated CI/CD pipelines using Jenkins and GitLab
+- Managed infrastructure as code with Terraform and Ansible
+- Implemented monitoring and logging with Prometheus and ELK
+
+DevOps Engineer - StartupScale | 2018-2020
+- Containerized applications using Docker and Kubernetes
+- Set up automated deployment pipelines
+- Managed cloud infrastructure on AWS and Azure
+
+CERTIFICATIONS
+- Certified Kubernetes Administrator (CKA)
+- AWS Certified Solutions Architect
+- Docker Certified Associate
+
+SKILLS
+- Kubernetes, Docker, Jenkins, GitLab CI/CD
+- Terraform, Ansible, AWS, Azure
+- Prometheus, Grafana, ELK Stack
+
+EDUCATION
+Bachelor of Science in Computer Engineering
+Tech Institute | 2014-2018

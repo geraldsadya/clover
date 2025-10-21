@@ -1,0 +1,33 @@
+Alex Thompson
+Computer Science Student
+alex.thompson@email.com | +1-555-0321
+
+EDUCATION
+Bachelor of Science in Computer Science
+State University | 2021-2025
+GPA: 3.7/4.0
+
+Relevant Coursework:
+- Data Structures and Algorithms
+- Software Engineering
+- Database Systems
+- Web Development
+
+PROJECTS
+Student Management System - Java | 2023
+- Built a console application for managing student records
+- Implemented CRUD operations and data validation
+
+Web Portfolio - HTML/CSS/JavaScript | 2022
+- Created responsive personal portfolio website
+- Implemented interactive features and animations
+
+SKILLS
+- Java, Python, C++
+- HTML, CSS, JavaScript
+- Git, Linux, MySQL
+
+ACTIVITIES
+- Computer Science Club Member
+- Hackathon Participant
+- Volunteer Tutor for Programming

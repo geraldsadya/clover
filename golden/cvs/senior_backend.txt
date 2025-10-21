@@ -1,0 +1,26 @@
+Michael Rodriguez
+Senior Backend Developer
+michael.rodriguez@email.com | +1-555-0456
+
+EXPERIENCE
+Senior Backend Developer - Enterprise Systems Ltd. | 2018-2024
+- Architected and developed scalable PHP applications using Laravel
+- Designed and maintained MySQL databases with complex relationships
+- Implemented RESTful APIs and microservices architecture
+- Led technical decisions and mentored junior developers
+
+Backend Developer - WebSolutions Corp. | 2015-2018
+- Built server-side applications using PHP and Laravel framework
+- Integrated third-party APIs and payment processing systems
+- Optimized database queries and application performance
+
+SKILLS
+- PHP, Laravel, MySQL, PostgreSQL
+- RESTful APIs, microservices, Docker
+- Git, Linux, AWS, Redis
+
+EDUCATION
+Master of Science in Software Engineering
+Tech University | 2013-2015
+Bachelor of Science in Computer Science
+State University | 2009-2013

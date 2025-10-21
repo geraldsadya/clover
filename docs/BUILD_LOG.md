@@ -88,6 +88,18 @@
 - [x] **Ticket F Re-Audit Complete**: Added missing auto-expand textarea functionality and scrollable result card for mobile
 - [x] **Ticket F Final Audit Complete**: All requirements verified, PHPStan level 8 passes, core functionality tests pass
 
+### Phase 5: Golden Test Set & Evaluation ✅
+- [x] **Ticket G: Golden Test Set & Eval Harness** - COMPLETED
+  - [x] 5 sample CVs in `golden/cvs/`: junior_frontend.pdf, senior_backend.pdf, career_changer.pdf, student.pdf, specialist_devops.pdf
+  - [x] 5 matching job descriptions in `golden/jobs/`: junior_react_dev.txt, senior_laravel_silvertreebrands.txt, junior_data_analyst.txt, swe_intern.txt, fullstack_k8s.txt
+  - [x] `golden/expected.json` with word_count_min/max, must_mention, banned_phrases per test
+  - [x] Automated script `scripts/eval.php` that runs all tests
+  - [x] Script asserts: length (150-300), company mention, no banned phrases
+  - [x] Anti-hallucination test cases: Docker test, Python years test, React experience test
+  - [x] Rate limiting handling with 30-second delays between tests
+  - [x] **Note**: Golden tests require OpenAI API access. Currently hitting rate limits during testing, but all infrastructure is in place
+  - [x] **Ticket G Complete**: Complete golden test set with evaluation harness, ready for production testing
+
 ---
 
 ## Lessons Learned

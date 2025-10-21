@@ -1,0 +1,30 @@
+Senior Laravel Developer - Silvertreebrands
+
+Silvertreebrands is seeking an experienced Senior Laravel Developer to lead our backend development team. You will architect and build scalable PHP applications that power our e-commerce platform.
+
+Responsibilities:
+- Design and develop robust Laravel applications and APIs
+- Architect scalable backend systems and microservices
+- Lead technical decisions and mentor junior developers
+- Optimize database performance and query efficiency
+- Implement security best practices and data protection
+- Collaborate with frontend teams to integrate APIs
+- Maintain and refactor legacy PHP codebases
+
+Requirements:
+- 5+ years of PHP development experience
+- 3+ years of Laravel framework experience
+- Strong knowledge of MySQL/PostgreSQL database design
+- Experience with RESTful API development
+- Understanding of software architecture patterns
+- Experience with version control (Git) and CI/CD pipelines
+- Bachelor's degree in Computer Science or equivalent experience
+
+Preferred Qualifications:
+- Experience with microservices architecture
+- Knowledge of Docker and containerization
+- AWS or other cloud platform experience
+- Experience with Redis caching
+- Understanding of queue systems and job processing
+
+At Silvertreebrands, we value innovation, collaboration, and technical excellence. We offer competitive compensation, comprehensive benefits, and a flexible work environment. Join our team and help us build the next generation of e-commerce solutions.

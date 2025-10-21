@@ -1,0 +1,47 @@
+[
+    {
+        "name": "Junior Frontend Developer",
+        "cv_file": "junior_frontend.pdf",
+        "job_file": "junior_react_dev.txt",
+        "word_count_min": 150,
+        "word_count_max": 300,
+        "must_mention": ["React", "frontend", "JavaScript"],
+        "banned_phrases": ["Docker", "Kubernetes", "Python", "machine learning", "DevOps"]
+    },
+    {
+        "name": "Senior Backend Developer",
+        "cv_file": "senior_backend.pdf",
+        "job_file": "senior_laravel_silvertreebrands.txt",
+        "word_count_min": 150,
+        "word_count_max": 300,
+        "must_mention": ["Laravel", "PHP", "backend", "Silvertreebrands"],
+        "banned_phrases": ["React", "Vue", "frontend", "CSS", "JavaScript"]
+    },
+    {
+        "name": "Career Changer",
+        "cv_file": "career_changer.pdf",
+        "job_file": "junior_data_analyst.txt",
+        "word_count_min": 150,
+        "word_count_max": 300,
+        "must_mention": ["data", "analysis", "analytical", "transition"],
+        "banned_phrases": ["5 years", "6 years", "7 years", "senior", "lead", "architect"]
+    },
+    {
+        "name": "Student Intern",
+        "cv_file": "student.pdf",
+        "job_file": "swe_intern.txt",
+        "word_count_min": 150,
+        "word_count_max": 300,
+        "must_mention": ["internship", "learning", "student", "university"],
+        "banned_phrases": ["5 years", "6 years", "7 years", "senior", "lead", "architect", "production"]
+    },
+    {
+        "name": "DevOps Specialist",
+        "cv_file": "specialist_devops.pdf",
+        "job_file": "fullstack_k8s.txt",
+        "word_count_min": 150,
+        "word_count_max": 300,
+        "must_mention": ["Kubernetes", "DevOps", "infrastructure", "containerization"],
+        "banned_phrases": ["React", "Vue", "Angular", "frontend", "CSS", "JavaScript"]
+    }
+]

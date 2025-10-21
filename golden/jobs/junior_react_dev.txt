@@ -1,0 +1,26 @@
+Junior React Developer
+
+We are looking for a passionate Junior React Developer to join our dynamic team at TechCorp. You will work on building modern, responsive web applications using React and JavaScript.
+
+Responsibilities:
+- Develop user-facing features using React.js
+- Build reusable components and front-end libraries
+- Translate designs and wireframes into high-quality code
+- Optimize components for maximum performance across web-capable devices
+- Collaborate with the design team to implement UI/UX designs
+- Participate in code reviews and maintain code quality standards
+
+Requirements:
+- 1-2 years of experience with React and JavaScript
+- Strong understanding of HTML5, CSS3, and responsive design
+- Experience with modern front-end build tools (webpack, npm)
+- Familiarity with Git version control
+- Good problem-solving skills and attention to detail
+- Bachelor's degree in Computer Science or related field preferred
+
+Nice to have:
+- Experience with Redux or other state management libraries
+- Knowledge of testing frameworks (Jest, React Testing Library)
+- Understanding of RESTful APIs
+
+We offer competitive salary, health benefits, flexible working hours, and opportunities for professional growth. Join us in building the future of web applications!

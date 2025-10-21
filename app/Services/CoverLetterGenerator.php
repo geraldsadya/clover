@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
+use App\Services\OpenAIClient;
 use Illuminate\Support\Facades\Log;
-use OpenAI\Laravel\Facades\OpenAI;
 use Illuminate\Support\Facades\Validator;
 
 class CoverLetterGenerator
@@ -14,6 +14,13 @@ class CoverLetterGenerator
     private const MAX_COMPOSITION_RETRIES = 1;
     private const MIN_WORD_COUNT = 150;
     private const MAX_WORD_COUNT = 300;
+
+    private OpenAIClient $openaiClient;
+
+    public function __construct()
+    {
+        $this->openaiClient = new OpenAIClient();
+    }
 
     /**
      * Extract structured facts from CV text as JSON (Stage 1)
@@ -107,29 +114,18 @@ class CoverLetterGenerator
     {
         $prompt = $this->buildExtractionPrompt($cvText, $attempt);
         
-        $response = OpenAI::chat()->create([
-            'model' => 'gpt-4-turbo',
-            'messages' => [
-                [
-                    'role' => 'system',
-                    'content' => 'You are a professional CV analyzer. Extract structured facts from CV text and return ONLY valid JSON. Do not invent information that is not explicitly stated.'
-                ],
-                [
-                    'role' => 'user',
-                    'content' => $prompt
-                ]
+        $messages = [
+            [
+                'role' => 'system',
+                'content' => 'You are a professional CV analyzer. Extract structured facts from CV text and return ONLY valid JSON. Do not invent information that is not explicitly stated.'
             ],
-            'temperature' => self::EXTRACTION_TEMPERATURE,
-            'max_tokens' => 2000,
-        ]);
+            [
+                'role' => 'user',
+                'content' => $prompt
+            ]
+        ];
 
-        $content = $response->choices[0]->message->content;
-        
-        if ($content === null) {
-            throw new \Exception('OpenAI returned null content');
-        }
-        
-        return $content;
+        return $this->openaiClient->chat($messages, self::EXTRACTION_TEMPERATURE);
     }
 
     /**
@@ -422,29 +418,18 @@ class CoverLetterGenerator
     {
         $prompt = $this->buildCompositionPrompt($facts, $sanitizedJobDescription, $companyAndRole, $attempt);
         
-        $response = OpenAI::chat()->create([
-            'model' => 'gpt-4-turbo',
-            'messages' => [
-                [
-                    'role' => 'system',
-                    'content' => 'You are a professional cover letter writer. Write compelling, personalized cover letters that are grounded in the provided facts. Do not invent information that is not explicitly provided.'
-                ],
-                [
-                    'role' => 'user',
-                    'content' => $prompt
-                ]
+        $messages = [
+            [
+                'role' => 'system',
+                'content' => 'You are a professional cover letter writer. Write compelling, personalized cover letters that are grounded in the provided facts. Do not invent information that is not explicitly provided.'
             ],
-            'temperature' => self::COMPOSITION_TEMPERATURE,
-            'max_tokens' => 1000,
-        ]);
+            [
+                'role' => 'user',
+                'content' => $prompt
+            ]
+        ];
 
-        $content = $response->choices[0]->message->content;
-        
-        if ($content === null) {
-            throw new \Exception('OpenAI returned null content');
-        }
-        
-        return $content;
+        return $this->openaiClient->chat($messages, self::COMPOSITION_TEMPERATURE);
     }
 
     /**

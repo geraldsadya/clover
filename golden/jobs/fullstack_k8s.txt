@@ -1,0 +1,30 @@
+Full-Stack Engineer - Kubernetes Platform
+
+CloudScale Technologies is looking for a Full-Stack Engineer with strong Kubernetes expertise to join our platform engineering team. You will work on building scalable, containerized applications that leverage Kubernetes for orchestration.
+
+Responsibilities:
+- Develop full-stack applications using React frontend and Go backend
+- Design and implement Kubernetes-native applications
+- Build and maintain containerized microservices
+- Implement CI/CD pipelines for Kubernetes deployments
+- Optimize application performance and scalability
+- Collaborate with DevOps team on infrastructure automation
+- Monitor and troubleshoot production systems
+
+Requirements:
+- 3+ years of full-stack development experience
+- Strong experience with Kubernetes and containerization
+- Proficiency in React.js and modern JavaScript frameworks
+- Backend development experience with Go, Node.js, or Python
+- Experience with Docker and container orchestration
+- Knowledge of microservices architecture patterns
+- Understanding of cloud platforms (AWS, GCP, or Azure)
+
+Preferred Skills:
+- Experience with Helm charts and Kubernetes operators
+- Knowledge of service mesh technologies (Istio, Linkerd)
+- Understanding of GitOps workflows
+- Experience with monitoring and observability tools
+- Familiarity with infrastructure as code (Terraform, Pulumi)
+
+At CloudScale, we're building the future of cloud-native applications. We offer competitive compensation, comprehensive benefits, and opportunities to work with cutting-edge technologies. Join our team and help shape the next generation of scalable software platforms.

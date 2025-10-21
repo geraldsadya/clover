@@ -1,0 +1,23 @@
+Sarah Johnson
+Frontend Developer
+sarah.johnson@email.com | +1-555-0123
+
+EXPERIENCE
+Frontend Developer - TechStart Inc. | 2022-2024
+- Developed responsive web applications using React and JavaScript
+- Collaborated with design team to implement UI/UX designs
+- Optimized application performance and user experience
+
+Junior Developer - WebCraft Solutions | 2021-2022
+- Built interactive web components using HTML, CSS, and JavaScript
+- Participated in code reviews and agile development processes
+
+SKILLS
+- React, JavaScript, HTML5, CSS3
+- Git, npm, webpack
+- Responsive design, cross-browser compatibility
+
+EDUCATION
+Bachelor of Science in Computer Science
+University of Technology | 2017-2021
+Relevant Coursework: Web Development, Data Structures, Algorithms

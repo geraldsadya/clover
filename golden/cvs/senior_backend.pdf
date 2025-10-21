@@ -1,0 +1,109 @@
+%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 612 792]
+/Contents 4 0 R
+/Resources <<
+/Font <<
+/F1 5 0 R
+>>
+>>
+>>
+endobj
+
+4 0 obj
+<<
+/Length 2500
+>>
+stream
+BT
+/F1 12 Tf
+50 750 Td
+(Michael Rodriguez) Tj
+0 -20 Td
+(Senior Backend Developer) Tj
+0 -20 Td
+(michael.rodriguez@email.com | +1-555-0456) Tj
+0 -40 Td
+(EXPERIENCE) Tj
+0 -20 Td
+(Senior Backend Developer - Enterprise Systems Ltd. | 2018-2024) Tj
+0 -15 Td
+(- Architected and developed scalable PHP applications using Laravel) Tj
+0 -15 Td
+(- Designed and maintained MySQL databases with complex relationships) Tj
+0 -15 Td
+(- Implemented RESTful APIs and microservices architecture) Tj
+0 -15 Td
+(- Led technical decisions and mentored junior developers) Tj
+0 -20 Td
+(Backend Developer - WebSolutions Corp. | 2015-2018) Tj
+0 -15 Td
+(- Built server-side applications using PHP and Laravel framework) Tj
+0 -15 Td
+(- Integrated third-party APIs and payment processing systems) Tj
+0 -15 Td
+(- Optimized database queries and application performance) Tj
+0 -40 Td
+(SKILLS) Tj
+0 -20 Td
+(- PHP, Laravel, MySQL, PostgreSQL) Tj
+0 -15 Td
+(- RESTful APIs, microservices, Docker) Tj
+0 -15 Td
+(- Git, Linux, AWS, Redis) Tj
+0 -40 Td
+(EDUCATION) Tj
+0 -20 Td
+(Master of Science in Software Engineering) Tj
+0 -15 Td
+(Tech University | 2013-2015) Tj
+0 -20 Td
+(Bachelor of Science in Computer Science) Tj
+0 -15 Td
+(State University | 2009-2013) Tj
+ET
+endstream
+endobj
+
+5 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/BaseFont /Helvetica
+>>
+endobj
+
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000274 00000 n 
+0000002840 00000 n 
+trailer
+<<
+/Size 6
+/Root 1 0 R
+>>
+startxref
+2917
+%%EOF

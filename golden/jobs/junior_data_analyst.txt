@@ -1,0 +1,29 @@
+Junior Data Analyst
+
+DataInsights Inc. is looking for a Junior Data Analyst to join our growing analytics team. This is an excellent opportunity for someone looking to transition into data analysis or start their career in the field.
+
+Responsibilities:
+- Analyze large datasets to identify trends and patterns
+- Create reports and visualizations using Excel, SQL, and Tableau
+- Support business decision-making with data-driven insights
+- Clean and validate data from multiple sources
+- Collaborate with stakeholders to understand business requirements
+- Present findings to team members and management
+- Maintain data quality and accuracy standards
+
+Requirements:
+- Bachelor's degree in Business, Statistics, Mathematics, or related field
+- Strong analytical and problem-solving skills
+- Proficiency in Excel and SQL
+- Experience with data visualization tools (Tableau, Power BI, or similar)
+- Excellent communication and presentation skills
+- Attention to detail and accuracy
+- Ability to work independently and in a team environment
+
+Nice to have:
+- Experience with Python or R for data analysis
+- Knowledge of statistical analysis methods
+- Previous experience in business intelligence or reporting
+- Understanding of database design principles
+
+We offer comprehensive training, mentorship opportunities, and a supportive environment for career growth. This role is perfect for someone looking to transition into data analysis or start their career in the field.

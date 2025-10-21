@@ -1,0 +1,29 @@
+Software Engineering Intern
+
+InnovateTech is seeking motivated Software Engineering Interns to join our development team for a 12-week summer internship program. This is an excellent opportunity to gain hands-on experience in software development while working on real-world projects.
+
+Responsibilities:
+- Assist in developing web applications and software solutions
+- Write clean, maintainable code under the guidance of senior developers
+- Participate in code reviews and learn best practices
+- Collaborate with team members on various projects
+- Learn about software development lifecycle and agile methodologies
+- Contribute to documentation and testing efforts
+- Attend team meetings and participate in technical discussions
+
+Requirements:
+- Currently enrolled in Computer Science, Software Engineering, or related program
+- Basic programming knowledge in at least one language (Java, Python, JavaScript, etc.)
+- Strong problem-solving and analytical skills
+- Eagerness to learn and adapt to new technologies
+- Good communication and teamwork abilities
+- GPA of 3.0 or higher preferred
+
+Learning Opportunities:
+- Hands-on experience with modern development tools and frameworks
+- Mentorship from experienced software engineers
+- Exposure to real-world software development processes
+- Networking opportunities with industry professionals
+- Potential for full-time employment upon graduation
+
+This internship provides valuable experience in a supportive learning environment. We welcome students from diverse backgrounds who are passionate about technology and eager to grow their skills in software development.
