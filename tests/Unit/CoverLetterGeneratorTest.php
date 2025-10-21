@@ -420,6 +420,260 @@ class CoverLetterGeneratorTest extends TestCase
         $this->assertFalse(str_ends_with($result, ' '));
     }
 
+    /**
+     * @test
+     */
+    public function it_generates_cover_letter_with_correct_word_count()
+    {
+        $facts = [
+            'name' => 'John Doe',
+            'skills' => ['PHP', 'Laravel', 'JavaScript'],
+            'experience' => [
+                [
+                    'company' => 'TechCorp',
+                    'role' => 'Senior Developer',
+                    'duration' => '2020-2023'
+                ]
+            ],
+            'education' => [
+                [
+                    'institution' => 'University of Tech',
+                    'degree' => 'Computer Science',
+                    'year' => '2018'
+                ]
+            ],
+            'certifications' => ['AWS Certified'],
+            'years_of_experience' => 5
+        ];
+
+        $jobDescription = 'Software Engineer position at TechCorp. We are looking for a talented developer with PHP skills.';
+
+        // Use reflection to test private method
+        $reflection = new \ReflectionClass($this->generator);
+        $method = $reflection->getMethod('parseAndValidateComposition');
+        $method->setAccessible(true);
+
+        $sampleCoverLetter = "Dear Hiring Manager,\n\nI am writing to express my strong interest in the Software Engineer position at TechCorp. With 5 years of experience in software development and expertise in PHP, Laravel, and JavaScript, I am confident that I would be a valuable addition to your team. My technical skills align perfectly with your requirements, and I am excited about the opportunity to contribute to your innovative projects.\n\nDuring my time as a Senior Developer at TechCorp, I have consistently delivered high-quality solutions and demonstrated strong problem-solving abilities. My AWS Certified credentials and Computer Science degree from University of Tech have provided me with a solid foundation for tackling complex technical challenges. I have successfully led development teams and implemented scalable architectures that improved system performance by 40%.\n\nI am excited about the opportunity to contribute to TechCorp's continued success and would welcome the chance to discuss how my skills and experience align with your needs. Thank you for considering my application.\n\nSincerely,\nJohn Doe";
+
+        $result = $method->invoke($this->generator, $sampleCoverLetter, $facts);
+        
+        $this->assertIsString($result);
+        $this->assertGreaterThanOrEqual(150, str_word_count($result));
+        $this->assertLessThanOrEqual(300, str_word_count($result));
+    }
+
+    /**
+     * @test
+     */
+    public function it_rejects_cover_letter_with_insufficient_word_count()
+    {
+        $facts = [
+            'name' => 'John Doe',
+            'skills' => ['PHP'],
+            'experience' => [],
+            'education' => [],
+            'certifications' => [],
+            'years_of_experience' => 3
+        ];
+
+        $shortCoverLetter = "Dear Hiring Manager, I am interested in the position. Best regards, John Doe";
+
+        // Use reflection to test private method
+        $reflection = new \ReflectionClass($this->generator);
+        $method = $reflection->getMethod('parseAndValidateComposition');
+        $method->setAccessible(true);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Word count');
+        $method->invoke($this->generator, $shortCoverLetter, $facts);
+    }
+
+    /**
+     * @test
+     */
+    public function it_rejects_cover_letter_with_excessive_word_count()
+    {
+        $facts = [
+            'name' => 'John Doe',
+            'skills' => ['PHP'],
+            'experience' => [],
+            'education' => [],
+            'certifications' => [],
+            'years_of_experience' => 3
+        ];
+
+        $longCoverLetter = str_repeat("This is a very long sentence that will make the cover letter exceed the word count limit. ", 50);
+
+        // Use reflection to test private method
+        $reflection = new \ReflectionClass($this->generator);
+        $method = $reflection->getMethod('parseAndValidateComposition');
+        $method->setAccessible(true);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Word count');
+        $method->invoke($this->generator, $longCoverLetter, $facts);
+    }
+
+    /**
+     * @test
+     */
+    public function it_detects_hallucinated_skills()
+    {
+        $facts = [
+            'name' => 'John Doe',
+            'skills' => ['PHP', 'Laravel'], // No Docker mentioned
+            'experience' => [],
+            'education' => [],
+            'certifications' => [],
+            'years_of_experience' => 3
+        ];
+
+        $coverLetterWithHallucination = "Dear Hiring Manager, I have extensive experience with PHP, Laravel, and Docker. Best regards, John Doe";
+
+        // Use reflection to test private method
+        $reflection = new \ReflectionClass($this->generator);
+        $method = $reflection->getMethod('validateGroundedness');
+        $method->setAccessible(true);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Hallucinated skill detected: Docker');
+        $method->invoke($this->generator, $coverLetterWithHallucination, $facts);
+    }
+
+    /**
+     * @test
+     */
+    public function it_accepts_cover_letter_with_only_provided_skills()
+    {
+        $facts = [
+            'name' => 'John Doe',
+            'skills' => ['PHP', 'Laravel', 'Docker'],
+            'experience' => [],
+            'education' => [],
+            'certifications' => [],
+            'years_of_experience' => 3
+        ];
+
+        $coverLetterWithValidSkills = "Dear Hiring Manager, I have extensive experience with PHP, Laravel, and Docker. Best regards, John Doe";
+
+        // Use reflection to test private method
+        $reflection = new \ReflectionClass($this->generator);
+        $method = $reflection->getMethod('validateGroundedness');
+        $method->setAccessible(true);
+
+        // Should not throw exception
+        $method->invoke($this->generator, $coverLetterWithValidSkills, $facts);
+        $this->assertTrue(true); // If we get here, validation passed
+    }
+
+    /**
+     * @test
+     */
+    public function it_extracts_company_and_role_from_job_description()
+    {
+        $jobDescription = 'Software Engineer position at TechCorp. We are looking for a talented developer.';
+
+        // Use reflection to test private method
+        $reflection = new \ReflectionClass($this->generator);
+        $method = $reflection->getMethod('extractCompanyAndRole');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->generator, $jobDescription);
+        
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('company', $result);
+        $this->assertArrayHasKey('role', $result);
+        $this->assertStringContainsString('TechCorp', $result['company']);
+        $this->assertStringContainsString('Software Engineer', $result['role']);
+    }
+
+    /**
+     * @test
+     */
+    public function it_builds_composition_prompt_correctly()
+    {
+        $facts = [
+            'name' => 'John Doe',
+            'skills' => ['PHP'],
+            'experience' => [],
+            'education' => [],
+            'certifications' => [],
+            'years_of_experience' => 3
+        ];
+        
+        $jobDescription = 'Software Engineer at TechCorp';
+        $companyAndRole = ['company' => 'TechCorp', 'role' => 'Software Engineer'];
+
+        // Use reflection to test private method
+        $reflection = new \ReflectionClass($this->generator);
+        $method = $reflection->getMethod('buildCompositionPrompt');
+        $method->setAccessible(true);
+
+        $prompt = $method->invoke($this->generator, $facts, $jobDescription, $companyAndRole, 0);
+        
+        $this->assertStringContainsString('Software Engineer at TechCorp', $prompt);
+        $this->assertStringContainsString('150-300 words', $prompt);
+        $this->assertStringContainsString('2-3 paragraphs', $prompt);
+        $this->assertStringContainsString('John Doe', $prompt);
+        $this->assertStringContainsString('PHP', $prompt);
+    }
+
+    /**
+     * @test
+     */
+    public function it_builds_stricter_composition_prompt_on_retry()
+    {
+        $facts = [
+            'name' => 'John Doe',
+            'skills' => ['PHP'],
+            'experience' => [],
+            'education' => [],
+            'certifications' => [],
+            'years_of_experience' => 3
+        ];
+        
+        $jobDescription = 'Software Engineer at TechCorp';
+        $companyAndRole = ['company' => 'TechCorp', 'role' => 'Software Engineer'];
+
+        // Use reflection to test private method
+        $reflection = new \ReflectionClass($this->generator);
+        $method = $reflection->getMethod('buildCompositionPrompt');
+        $method->setAccessible(true);
+
+        $retryPrompt = $method->invoke($this->generator, $facts, $jobDescription, $companyAndRole, 1);
+        
+        $this->assertStringContainsString('IMPORTANT: This is a retry attempt', $retryPrompt);
+        $this->assertStringContainsString('150-300 words', $retryPrompt);
+    }
+
+    /**
+     * @test
+     */
+    public function it_handles_markdown_formatted_cover_letter()
+    {
+        $facts = [
+            'name' => 'John Doe',
+            'skills' => ['PHP'],
+            'experience' => [],
+            'education' => [],
+            'certifications' => [],
+            'years_of_experience' => 3
+        ];
+
+        $markdownCoverLetter = '```' . "\n" . str_repeat("This is a properly formatted cover letter with sufficient word count. ", 25) . "\n```";
+
+        // Use reflection to test private method
+        $reflection = new \ReflectionClass($this->generator);
+        $method = $reflection->getMethod('parseAndValidateComposition');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->generator, $markdownCoverLetter, $facts);
+        
+        $this->assertIsString($result);
+        $this->assertStringNotContainsString('```', $result);
+        $this->assertGreaterThanOrEqual(150, str_word_count($result));
+    }
+
     protected function tearDown(): void
     {
         Mockery::close();

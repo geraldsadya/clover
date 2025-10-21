@@ -65,6 +65,17 @@
   - [x] **Ticket C Complete**: Facts extraction service with robust error handling and anti-hallucination measures
   - [x] **Ticket D Complete**: Job ad sanitization with HTML stripping, UTM removal, and length capping
 
+### Phase 4: Cover Letter Composition ✅
+- [x] **Ticket E: Cover Letter Composition (Stage 2)** - COMPLETED
+  - [x] Composition prompt with temp=0.4 (moderate creativity)
+  - [x] Enforce 2-3 paragraphs, 150-300 words total
+  - [x] Include company name and role from job description
+  - [x] Groundedness check: only use facts from Stage 1 JSON
+  - [x] Word count validation (re-prompt once if outside range)
+  - [x] Tests: length correct, company mentioned, no hallucinated skills
+  - [x] Anti-hallucination test passes (CV without Docker + job with Docker = no Docker mention)
+  - [x] **Ticket E Complete**: Complete cover letter generation with AI integration, word count validation, and anti-hallucination measures
+
 ---
 
 ## Lessons Learned

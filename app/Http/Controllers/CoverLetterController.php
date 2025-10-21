@@ -55,16 +55,16 @@ class CoverLetterController extends Controller
                 ], 422);
             }
             
-            // TODO: Implement Stage 2 - Generate cover letter from facts and job description
-            // For now, return facts extraction results
+            // Generate cover letter from facts and job description (Stage 2)
+            $coverLetter = $this->coverLetterGenerator->generateCoverLetter($facts, $request->input('job_description'));
             
             $duration = (microtime(true) - $startTime) * 1000;
             
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'cover_letter' => 'Cover letter generation will be implemented in Ticket E. Facts extraction completed successfully.',
-                    'word_count' => 15,
+                    'cover_letter' => $coverLetter,
+                    'word_count' => str_word_count($coverLetter),
                     'request_id' => $requestId,
                     'facts' => $facts,
                     'cv_text_length' => strlen($cvText)
