@@ -19,6 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register CSP nonce for inline scripts
+        $this->app->singleton('csp_nonce', function () {
+            return base64_encode(random_bytes(16));
+        });
     }
 }

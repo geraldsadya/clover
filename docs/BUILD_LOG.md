@@ -75,6 +75,18 @@
   - [x] Tests: length correct, company mentioned, no hallucinated skills
   - [x] Anti-hallucination test passes (CV without Docker + job with Docker = no Docker mention)
   - [x] **Ticket E Complete**: Complete cover letter generation with AI integration, word count validation, and anti-hallucination measures
+- [x] **Ticket F: UI Polish** - COMPLETED
+  - [x] Loading state with spinner ("Generating your cover letter...")
+  - [x] Submit button disabled during processing
+  - [x] Copy-to-clipboard button with toast notification
+  - [x] ARIA labels on all inputs and buttons
+  - [x] Keyboard navigation works (Tab order logical)
+  - [x] Mobile responsive: single column <768px, touch-friendly upload area
+  - [x] No layout shift when result appears
+  - [x] Tests: accessibility audit passes (manual), mobile works (manual)
+  - [x] **Ticket F Complete**: Complete UI polish with Alpine.js, accessibility, mobile responsiveness, and comprehensive testing
+- [x] **Ticket F Re-Audit Complete**: Added missing auto-expand textarea functionality and scrollable result card for mobile
+- [x] **Ticket F Final Audit Complete**: All requirements verified, PHPStan level 8 passes, core functionality tests pass
 
 ---
 
