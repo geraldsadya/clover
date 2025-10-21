@@ -43,6 +43,10 @@ SESSION_HTTP_ONLY=true
 SESSION_SAME_SITE=lax
 
 PORT=8000
+
+# Railway-specific variables (automatically set by Railway)
+RAILWAY_PUBLIC_DOMAIN=your-app-name.railway.app
+RAILWAY_PRIVATE_DOMAIN=your-app-name.railway.internal
 ```
 
 ## Step 3: Generate APP_KEY

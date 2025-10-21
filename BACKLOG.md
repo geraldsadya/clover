@@ -289,7 +289,7 @@ Deploy to Railway with proper configs and smoke testing.
 
 **Acceptance Criteria**:
 - [x] `railway.json` with build and deploy commands
-- [x] `nixpacks.toml` with `php82`, `poppler_utils` (for pdftotext)
+- [x] RAILPACK builder automatically handles `php82`, `poppler_utils` (for pdftotext)
 - [x] Environment variables set on Railway: OPENAI_API_KEY, APP_KEY, etc.
 - [x] Database migrations run automatically (`php artisan migrate --force`)
 - [x] Smoke test: upload CV on live URL, verify /healthz works
