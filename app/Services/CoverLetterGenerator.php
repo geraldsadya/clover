@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 class CoverLetterGenerator
 {
     private const EXTRACTION_TEMPERATURE = 0.1;
-    private const MAX_RETRIES = 2;
+    private const MAX_RETRIES = 1;
 
     /**
      * Extract structured facts from CV text as JSON (Stage 1)
@@ -64,7 +64,7 @@ class CoverLetterGenerator
         $attempt = 0;
         $lastError = null;
 
-        while ($attempt <= self::MAX_RETRIES) {
+        for ($attempt = 0; $attempt <= self::MAX_RETRIES; $attempt++) {
             try {
                 $response = $this->callOpenAI($cvText, $attempt);
                 $facts = $this->parseAndValidateResponse($response);
@@ -78,17 +78,12 @@ class CoverLetterGenerator
 
             } catch (\Exception $e) {
                 $lastError = $e;
-                $attempt++;
 
                 Log::warning('Extraction attempt failed', [
                     'request_id' => $requestId,
-                    'attempt' => $attempt,
+                    'attempt' => $attempt + 1,
                     'error' => $e->getMessage(),
                 ]);
-
-                if ($attempt > self::MAX_RETRIES) {
-                    break;
-                }
             }
         }
 
