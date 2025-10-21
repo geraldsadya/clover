@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\GenerateCoverLetterRequest;
 use App\Services\PdfExtractor;
+use App\Services\CoverLetterGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -11,7 +12,8 @@ use Illuminate\View\View;
 class CoverLetterController extends Controller
 {
     public function __construct(
-        private PdfExtractor $pdfExtractor
+        private PdfExtractor $pdfExtractor,
+        private CoverLetterGenerator $coverLetterGenerator
     ) {}
 
     /**
@@ -27,35 +29,60 @@ class CoverLetterController extends Controller
      */
     public function generate(GenerateCoverLetterRequest $request): JsonResponse
     {
+        $requestId = uniqid('req_', true);
+        $startTime = microtime(true);
+
         try {
             // Extract text from PDF
             $cvText = $this->pdfExtractor->extract($request->file('cv'));
             
-            // TODO: Implement AI cover letter generation
-            // For now, return a placeholder response with extracted text info
+            // Extract facts from CV text (Stage 1)
+            $facts = $this->coverLetterGenerator->extractFacts($cvText);
+            
+            // Check if extraction failed and needs manual processing
+            if (isset($facts['status']) && $facts['status'] === 'needs-manual') {
+                return response()->json([
+                    'success' => false,
+                    'error' => [
+                        'message' => 'Unable to process CV automatically. Please ensure the PDF contains readable text.',
+                        'code' => 'CV_PROCESSING_FAILED',
+                        'request_id' => $requestId
+                    ]
+                ], 422);
+            }
+            
+            // TODO: Implement Stage 2 - Generate cover letter from facts and job description
+            // For now, return facts extraction results
+            
+            $duration = (microtime(true) - $startTime) * 1000;
             
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'cover_letter' => 'This is a placeholder cover letter. The actual implementation will generate a tailored cover letter using AI based on the extracted CV text and job description.',
-                    'word_count' => 25,
-                    'request_id' => uniqid('req_', true),
-                    'cv_text_length' => strlen($cvText),
-                    'cv_text_preview' => substr($cvText, 0, 100) . '...'
+                    'cover_letter' => 'Cover letter generation will be implemented in Ticket E. Facts extraction completed successfully.',
+                    'word_count' => 15,
+                    'request_id' => $requestId,
+                    'facts' => $facts,
+                    'cv_text_length' => strlen($cvText)
                 ],
                 'meta' => [
-                    'tokens_used' => 0,
-                    'processing_time_ms' => 100
+                    'tokens_used' => 0, // Will be updated when OpenAI integration is complete
+                    'processing_time_ms' => round($duration, 2)
                 ]
             ]);
             
         } catch (\Exception $e) {
+            $duration = (microtime(true) - $startTime) * 1000;
+            
             return response()->json([
                 'success' => false,
                 'error' => [
                     'message' => $e->getMessage(),
-                    'code' => 'PDF_EXTRACTION_FAILED',
-                    'request_id' => uniqid('req_', true)
+                    'code' => 'PROCESSING_FAILED',
+                    'request_id' => $requestId
+                ],
+                'meta' => [
+                    'processing_time_ms' => round($duration, 2)
                 ]
             ], 422);
         }
