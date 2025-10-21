@@ -44,13 +44,27 @@ class OpenAIClient
 
         while (true) {
             try {
-                $response = $this->http->post('chat/completions', [
-                    'headers' => [
+                // Azure OpenAI uses different endpoint format
+                $baseUrl = env('OPENAI_BASE', 'https://api.openai.com');
+                if (str_contains($baseUrl, 'openai.azure.com')) {
+                    // Azure format: https://resource.openai.azure.com/openai/deployments/deployment/chat/completions?api-version=2024-10-21
+                    $endpoint = $baseUrl . '/chat/completions?api-version=2024-10-21';
+                    $headers = [
+                        'api-key' => $this->apiKey,
+                        'Content-Type' => 'application/json',
+                    ];
+                } else {
+                    // Standard OpenAI format
+                    $endpoint = 'chat/completions';
+                    $headers = [
                         'Authorization' => 'Bearer ' . $this->apiKey,
                         'Content-Type' => 'application/json',
-                    ],
+                    ];
+                }
+
+                $response = $this->http->post($endpoint, [
+                    'headers' => $headers,
                     'json' => [
-                        'model' => $this->model,
                         'messages' => $messages,
                         'temperature' => $temperature,
                         'max_tokens' => 300, // Keep output small for Free tier
