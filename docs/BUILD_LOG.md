@@ -51,13 +51,18 @@
   - [x] Tests: valid PDF extracts text, edge cases throw exceptions, files deleted
   - [x] **Ticket B Complete**: PDF extraction service with comprehensive error handling, temp file management, and PHPStan level 8 compliance - all tests passing
 
----
-
-## Next Steps
-- [ ] Create GitHub issues A-K from backlog
-- [ ] Start Ticket C: Facts JSON Extraction (Stage 1)
-- [ ] Implement two-stage AI pipeline: extract facts → compose letter
-- [ ] Add OpenAI integration with proper error handling
+### Phase 3: AI Service Integration ✅
+- [x] **Ticket C: Facts JSON Extraction (Stage 1)** - COMPLETED
+  - [x] Extraction prompt with temp=0.1 (low creativity)
+  - [x] JSON schema validation (name, skills, experience, education, certifications, years_of_experience)
+  - [x] Retry logic: 2 retries on malformed JSON with stricter prompt
+  - [x] Fallback: return `needs-manual` path on double failure
+  - [x] Log extraction metrics (tokens, duration, outcome)
+  - [x] Tests: returns valid JSON, retries work, banned phrases not invented
+  - [x] CoverLetterGenerator service with OpenAI integration
+  - [x] Comprehensive unit tests (10 test cases)
+  - [x] PHPStan level 8 compliance with proper type annotations
+  - [x] **Ticket C Complete**: Facts extraction service with robust error handling and anti-hallucination measures
 
 ---
 
