@@ -67,7 +67,7 @@ class CoverLetterController extends Controller
                 return response()->json([
                     'success' => false,
                     'error' => [
-                        'message' => 'Unable to process CV automatically. Please ensure the PDF contains readable text.',
+                        'message' => 'Unable to extract CV information from this PDF. The document may not be a CV, or it may not contain standard CV elements (name, experience, skills, education). Please upload a valid CV/resume in PDF format.',
                         'code' => 'CV_PROCESSING_FAILED',
                         'request_id' => $requestId,
                     ],

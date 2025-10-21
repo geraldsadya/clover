@@ -15,9 +15,9 @@ class CoverLetterGenerator
 
     private const MAX_COMPOSITION_RETRIES = 1;
 
-    private const MIN_WORD_COUNT = 150;
+    private const MIN_WORD_COUNT = 100;  // Flexible for junior CVs with limited experience
 
-    private const MAX_WORD_COUNT = 300;
+    private const MAX_WORD_COUNT = 450;  // Generous for senior CVs with extensive experience
 
     private OpenAIClient $openaiClient;
 
@@ -261,7 +261,7 @@ class CoverLetterGenerator
      *
      * @param  array<string, mixed>  $facts  Extracted facts from Stage 1
      * @param  string  $jobDescription  Raw job description (will be sanitized internally)
-     * @return string Generated cover letter (150-300 words, 2-3 paragraphs)
+     * @return string Generated cover letter (100-450 words, 2-3 paragraphs)
      */
     public function generateCoverLetter(array $facts, string $jobDescription): string
     {
@@ -465,15 +465,17 @@ class CoverLetterGenerator
         $basePrompt = "Write a professional cover letter for {$companyAndRole['role']} at {$companyAndRole['company']}.\n\n";
 
         $basePrompt .= "REQUIREMENTS:\n";
-        $basePrompt .= "- 2-3 paragraphs, 150-300 words total\n";
+        $basePrompt .= "- 2-3 paragraphs, 100-450 words total (adjust length based on experience level)\n";
         $basePrompt .= "- Include company name and role\n";
         $basePrompt .= "- Use ONLY the facts provided below\n";
         $basePrompt .= "- Do not invent skills, experience, or qualifications not mentioned\n";
         $basePrompt .= "- Write in first person\n";
-        $basePrompt .= "- Be professional and compelling\n\n";
+        $basePrompt .= "- Be professional and compelling\n";
+        $basePrompt .= "- For junior candidates with limited experience, keep it concise (100-200 words)\n";
+        $basePrompt .= "- For senior candidates with extensive experience, be more comprehensive (250-450 words)\n\n";
 
         if ($attempt > 0) {
-            $basePrompt .= "IMPORTANT: This is a retry attempt. Ensure the word count is between 150-300 words and the content is grounded in the provided facts only.\n\n";
+            $basePrompt .= "IMPORTANT: This is a retry attempt. Ensure the word count is between 100-450 words (adjust for experience level) and the content is grounded in the provided facts only.\n\n";
         }
 
         $basePrompt .= "CANDIDATE FACTS:\n";

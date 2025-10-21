@@ -69,7 +69,7 @@ class OpenAIClient
                         'model' => env('MODEL', 'gpt-4o-mini'),
                         'messages' => $messages,
                         'temperature' => $temperature,
-                        'max_tokens' => 300, // Keep output small for Free tier
+                        'max_tokens' => 600, // Supports up to ~450 words for senior CVs
                     ],
                     'timeout' => 60,
                 ]);
