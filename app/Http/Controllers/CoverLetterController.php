@@ -8,7 +8,9 @@ use App\Services\OpenAIClient;
 use App\Services\PdfExtractor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class CoverLetterController extends Controller
 {
@@ -30,7 +32,8 @@ class CoverLetterController extends Controller
      */
     public function generate(GenerateCoverLetterRequest $request): JsonResponse
     {
-        $requestId = $request->header('X-Request-ID', 'unknown');
+        $requestIdHeader = $request->header('X-Request-ID');
+        $requestId = is_string($requestIdHeader) ? $requestIdHeader : 'unknown';
         $startTime = microtime(true);
 
         // Log request start (NO PII)
@@ -143,7 +146,7 @@ class CoverLetterController extends Controller
         
         // Check database connectivity
         try {
-            \DB::connection()->getPdo();
+            DB::connection()->getPdo();
             $checks['database'] = 'ok';
         } catch (\Exception $e) {
             $checks['database'] = 'error';
@@ -182,8 +185,8 @@ class CoverLetterController extends Controller
         // Check storage accessibility
         try {
             $testFile = 'health-check-test-' . uniqid();
-            \Storage::put($testFile, 'test');
-            \Storage::delete($testFile);
+            Storage::put($testFile, 'test');
+            Storage::delete($testFile);
             $checks['storage'] = 'ok';
         } catch (\Exception $e) {
             $checks['storage'] = 'error';
@@ -225,7 +228,7 @@ class CoverLetterController extends Controller
     {
         try {
             $uptime = shell_exec('uptime');
-            return trim($uptime ?? 'unknown');
+            return trim($uptime ?: 'unknown');
         } catch (\Exception $e) {
             return 'unknown';
         }
