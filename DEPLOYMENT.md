@@ -52,10 +52,10 @@ php artisan key:generate --show
 ```
 
 ## Step 4: Deploy
-1. Railway will automatically detect the `railway.json` and `nixpacks.toml` files
-2. The deployment will:
-   - Install PHP 8.2 and poppler-utils (for pdftotext)
-   - Run `composer install --no-dev`
+1. Railway will automatically detect the `railway.json` file
+2. RAILPACK builder will automatically:
+   - Install PHP 8.2 and required dependencies (including poppler-utils for pdftotext)
+   - Run `composer install --no-dev --optimize-autoloader`
    - Generate application key
    - Cache configurations
    - Run database migrations
@@ -70,7 +70,13 @@ php artisan key:generate --show
 ## Step 6: Run Golden Tests
 Execute the golden test suite against production:
 ```bash
-php scripts/eval.php --production-url=https://your-app-name.railway.app
+php scripts/eval-production.php --url=https://your-app-name.railway.app
+```
+
+## Step 7: Verify Security Headers
+Check security headers:
+```bash
+php scripts/verify-security-headers.php --url=https://your-app-name.railway.app
 ```
 
 ## Monitoring
@@ -83,3 +89,4 @@ php scripts/eval.php --production-url=https://your-app-name.railway.app
 - Verify all environment variables are set
 - Ensure OpenAI API key is valid
 - Check database migrations completed successfully
+- Verify pdftotext binary is available (installed automatically by RAILPACK)

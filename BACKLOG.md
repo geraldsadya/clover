@@ -297,10 +297,9 @@ Deploy to Railway with proper configs and smoke testing.
 - [x] Security headers verified (securityheaders.com)
 
 **Files Created**:
-- `railway.json` (Railway deployment configuration)
-- `nixpacks.toml` (PHP 8.2 + poppler-utils configuration)
+- `railway.json` (Railway deployment configuration with RAILPACK builder)
 - `DEPLOYMENT.md` (Comprehensive deployment guide)
-- `scripts/eval-production.php` (Production golden test script)
+- `scripts/eval-production.php` (Production golden test script - FIXED)
 - `scripts/verify-security-headers.php` (Security headers verification)
 
 **Definition of Done**:

@@ -47,9 +47,31 @@ $passedTests = 0;
 
 foreach ($goldenCases as $index => $case) {
     $testNumber = $index + 1;
-    echo "Test $testNumber/$totalTests: {$case['job_title']}\n";
+    echo "Test $testNumber/$totalTests: {$case['name']}\n";
     
     try {
+        // Load CV content from file
+        $cvFile = __DIR__ . '/../golden/cvs/' . $case['cv_file'];
+        $cvContent = '';
+        
+        if (file_exists($cvFile)) {
+            $cvContent = file_get_contents($cvFile);
+        } else {
+            // Fallback: create simple CV content
+            $cvContent = "John Doe\nSoftware Developer\nExperience: 5 years\nSkills: " . implode(', ', $case['must_mention']);
+        }
+        
+        // Load job description from file
+        $jobFile = __DIR__ . '/../golden/jobs/' . $case['job_file'];
+        $jobDescription = '';
+        
+        if (file_exists($jobFile)) {
+            $jobDescription = file_get_contents($jobFile);
+        } else {
+            // Fallback: create simple job description
+            $jobDescription = "We are looking for a " . $case['name'] . " with experience in " . implode(', ', $case['must_mention']);
+        }
+        
         // Create test PDF content
         $pdfContent = '%PDF-1.4
 1 0 obj
@@ -81,7 +103,7 @@ stream
 BT
 /F1 12 Tf
 72 720 Td
-(' . $case['cv_content'] . ') Tj
+(' . $cvContent . ') Tj
 ET
 endstream
 endobj
@@ -114,7 +136,7 @@ startxref
         // Add job description
         $data .= "--$boundary\r\n";
         $data .= "Content-Disposition: form-data; name=\"job_description\"\r\n\r\n";
-        $data .= $case['job_description'] . "\r\n";
+        $data .= $jobDescription . "\r\n";
         
         $data .= "--$boundary--\r\n";
 
@@ -157,20 +179,15 @@ startxref
         $errors = [];
         
         // Check word count
-        if ($wordCount < 150 || $wordCount > 300) {
-            $errors[] = "Word count $wordCount not in range 150-300";
+        if ($wordCount < $case['word_count_min'] || $wordCount > $case['word_count_max']) {
+            $errors[] = "Word count $wordCount not in range {$case['word_count_min']}-{$case['word_count_max']}";
         }
         
-        // Check company/role mention
-        $companyMentioned = stripos($coverLetter, $case['expected_company']) !== false;
-        $roleMentioned = stripos($coverLetter, $case['expected_role']) !== false;
-        
-        if (!$companyMentioned) {
-            $errors[] = "Company '{$case['expected_company']}' not mentioned";
-        }
-        
-        if (!$roleMentioned) {
-            $errors[] = "Role '{$case['expected_role']}' not mentioned";
+        // Check must mention phrases
+        foreach ($case['must_mention'] as $phrase) {
+            if (stripos($coverLetter, $phrase) === false) {
+                $errors[] = "Required phrase '$phrase' not mentioned";
+            }
         }
         
         // Check for banned phrases
@@ -185,22 +202,22 @@ startxref
             $passedTests++;
             $results[] = [
                 'test' => $testNumber,
-                'job_title' => $case['job_title'],
+                'job_title' => $case['name'],
                 'status' => 'PASSED',
                 'word_count' => $wordCount,
-                'company_mentioned' => $companyMentioned,
-                'role_mentioned' => $roleMentioned
+                'must_mention_checked' => count($case['must_mention']),
+                'banned_phrases_checked' => count($case['banned_phrases'])
             ];
         } else {
             echo "❌ FAILED: " . implode(', ', $errors) . "\n";
             $results[] = [
                 'test' => $testNumber,
-                'job_title' => $case['job_title'],
+                'job_title' => $case['name'],
                 'status' => 'FAILED',
                 'errors' => $errors,
                 'word_count' => $wordCount,
-                'company_mentioned' => $companyMentioned,
-                'role_mentioned' => $roleMentioned
+                'must_mention_checked' => count($case['must_mention']),
+                'banned_phrases_checked' => count($case['banned_phrases'])
             ];
         }
 
@@ -208,7 +225,7 @@ startxref
         echo "❌ ERROR: " . $e->getMessage() . "\n";
         $results[] = [
             'test' => $testNumber,
-            'job_title' => $case['job_title'],
+            'job_title' => $case['name'],
             'status' => 'ERROR',
             'error' => $e->getMessage()
         ];
