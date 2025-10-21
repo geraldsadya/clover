@@ -83,12 +83,15 @@ class CoverLetterGenerator
 
         for ($attempt = 0; $attempt <= self::MAX_RETRIES; $attempt++) {
             try {
-                $response = $this->callOpenAI($cvText, $attempt);
-                $facts = $this->parseAndValidateResponse($response);
+                $openaiResponse = $this->callOpenAI($cvText, $attempt);
+                $facts = $this->parseAndValidateResponse($openaiResponse['content']);
 
                 Log::info('Extraction attempt successful', [
                     'request_id' => $requestId,
                     'attempt' => $attempt + 1,
+                    'tokens_in' => $openaiResponse['usage']['tokens_in'],
+                    'tokens_out' => $openaiResponse['usage']['tokens_out'],
+                    'tokens_total' => $openaiResponse['usage']['tokens_total'],
                 ]);
 
                 return $facts;
@@ -115,8 +118,9 @@ class CoverLetterGenerator
 
     /**
      * Call OpenAI API for facts extraction
+     * @return array{content: string, usage: array{tokens_in: int, tokens_out: int, tokens_total: int}}
      */
-    private function callOpenAI(string $cvText, int $attempt): string
+    private function callOpenAI(string $cvText, int $attempt): array
     {
         $prompt = $this->buildExtractionPrompt($cvText, $attempt);
 
@@ -383,13 +387,16 @@ class CoverLetterGenerator
 
         for ($attempt = 0; $attempt <= self::MAX_COMPOSITION_RETRIES; $attempt++) {
             try {
-                $response = $this->callOpenAIForComposition($facts, $sanitizedJobDescription, $companyAndRole, $attempt);
-                $coverLetter = $this->parseAndValidateComposition($response, $facts);
+                $openaiResponse = $this->callOpenAIForComposition($facts, $sanitizedJobDescription, $companyAndRole, $attempt);
+                $coverLetter = $this->parseAndValidateComposition($openaiResponse['content'], $facts);
 
                 Log::info('Composition attempt successful', [
                     'request_id' => $requestId,
                     'attempt' => $attempt + 1,
                     'word_count' => str_word_count($coverLetter),
+                    'tokens_in' => $openaiResponse['usage']['tokens_in'],
+                    'tokens_out' => $openaiResponse['usage']['tokens_out'],
+                    'tokens_total' => $openaiResponse['usage']['tokens_total'],
                 ]);
 
                 return $coverLetter;
@@ -419,8 +426,9 @@ class CoverLetterGenerator
      *
      * @param  array<string, mixed>  $facts
      * @param  array<string, string>  $companyAndRole
+     * @return array{content: string, usage: array{tokens_in: int, tokens_out: int, tokens_total: int}}
      */
-    private function callOpenAIForComposition(array $facts, string $sanitizedJobDescription, array $companyAndRole, int $attempt): string
+    private function callOpenAIForComposition(array $facts, string $sanitizedJobDescription, array $companyAndRole, int $attempt): array
     {
         $prompt = $this->buildCompositionPrompt($facts, $sanitizedJobDescription, $companyAndRole, $attempt);
 

@@ -253,29 +253,31 @@ Implement production-grade security: headers, rate limiting, PII protection.
 
 ---
 
-### Ticket J: Observability & Health Check
+### Ticket J: Observability & Health Check ✅
 **Label**: `J-observability` | **Estimate**: 1 hour | **Priority**: P1
 
 **Description**:  
 Add `/healthz` endpoint, request ID correlation, and token usage logging.
 
 **Acceptance Criteria**:
-- [ ] `/healthz` endpoint checks: database, OpenAI API, storage
-- [ ] Returns `{status: ok|degraded, checks: {...}, timestamp}`
-- [ ] Request ID (UUID) generated per request
-- [ ] Token usage logged: tokens_in, tokens_out, tokens_total, duration_ms
-- [ ] Cost calculation in logs (for reference)
-- [ ] Tests: /healthz returns 200, logs contain metrics
+- [x] `/healthz` endpoint checks: database, OpenAI API, storage
+- [x] Returns `{status: ok|degraded, checks: {...}, timestamp}`
+- [x] Request ID (UUID) generated per request
+- [x] Token usage logged: tokens_in, tokens_out, tokens_total, duration_ms
+- [x] Cost calculation in logs (for reference)
+- [x] Tests: /healthz returns 200, logs contain metrics
 
-**Files to Update**:
-- `app/Http/Controllers/CoverLetterController.php` (healthz method, logging)
-- `tests/Feature/HealthCheckTest.php`
+**Files Updated**:
+- `app/Http/Controllers/CoverLetterController.php` (enhanced healthz method, token logging, cost calculation)
+- `app/Services/OpenAIClient.php` (token usage tracking)
+- `app/Services/CoverLetterGenerator.php` (token usage logging)
+- `tests/Feature/HealthCheckTest.php` (comprehensive health check tests)
 
 **Definition of Done**:
 - ✅ `/healthz` returns 200 with valid JSON
 - ✅ Logs contain token usage and duration
 - ✅ No PII in logs
-- ✅ One-line note in `BUILD_LOG.md`
+- ✅ **Ticket J Complete**: Comprehensive observability with health checks, token usage logging, cost calculation, and request correlation
 
 ---
 

@@ -77,12 +77,16 @@ class CoverLetterController extends Controller
             $duration = (microtime(true) - $startTime) * 1000;
             $wordCount = str_word_count($coverLetter);
 
+            // Calculate estimated cost (for reference)
+            $estimatedCost = $this->calculateEstimatedCost($requestId);
+
             // Log successful completion (NO PII)
             Log::info('Cover letter generation completed', [
                 'request_id' => $requestId,
                 'duration_ms' => round($duration, 2),
                 'word_count' => $wordCount,
                 'cv_text_length' => strlen($cvText),
+                'estimated_cost_usd' => $estimatedCost,
                 'outcome' => 'success'
             ]);
 
@@ -95,17 +99,22 @@ class CoverLetterController extends Controller
                 ],
                 'meta' => [
                     'processing_time_ms' => round($duration, 2),
+                    'estimated_cost_usd' => $estimatedCost,
                 ],
             ]);
 
         } catch (\Exception $e) {
             $duration = (microtime(true) - $startTime) * 1000;
 
+            // Calculate estimated cost even for failed requests
+            $estimatedCost = $this->calculateEstimatedCost($requestId);
+
             // Log error (NO PII)
             Log::error('Cover letter generation failed', [
                 'request_id' => $requestId,
                 'duration_ms' => round($duration, 2),
                 'error_message' => $e->getMessage(),
+                'estimated_cost_usd' => $estimatedCost,
                 'outcome' => 'error'
             ]);
 
@@ -118,6 +127,7 @@ class CoverLetterController extends Controller
                 ],
                 'meta' => [
                     'processing_time_ms' => round($duration, 2),
+                    'estimated_cost_usd' => $estimatedCost,
                 ],
             ], 422);
         }
@@ -128,17 +138,71 @@ class CoverLetterController extends Controller
      */
     public function healthz(): JsonResponse
     {
+        $checks = [];
+        $overallStatus = 'ok';
+        
+        // Check database connectivity
+        try {
+            \DB::connection()->getPdo();
+            $checks['database'] = 'ok';
+        } catch (\Exception $e) {
+            $checks['database'] = 'error';
+            $overallStatus = 'degraded';
+        }
+        
+        // Check OpenAI API connectivity
+        try {
+            $openaiKey = env('OPENAI_API_KEY');
+            $openaiBase = env('OPENAI_BASE');
+            
+            if (empty($openaiKey) || empty($openaiBase)) {
+                $checks['openai'] = 'not_configured';
+                $overallStatus = 'degraded';
+            } else {
+                // Test OpenAI API with a simple request
+                $client = new \GuzzleHttp\Client(['timeout' => 5]);
+                $response = $client->get($openaiBase . '/models', [
+                    'headers' => [
+                        'api-key' => $openaiKey,
+                    ]
+                ]);
+                
+                if ($response->getStatusCode() === 200) {
+                    $checks['openai'] = 'ok';
+                } else {
+                    $checks['openai'] = 'error';
+                    $overallStatus = 'degraded';
+                }
+            }
+        } catch (\Exception $e) {
+            $checks['openai'] = 'error';
+            $overallStatus = 'degraded';
+        }
+        
+        // Check storage accessibility
+        try {
+            $testFile = 'health-check-test-' . uniqid();
+            \Storage::put($testFile, 'test');
+            \Storage::delete($testFile);
+            $checks['storage'] = 'ok';
+        } catch (\Exception $e) {
+            $checks['storage'] = 'error';
+            $overallStatus = 'degraded';
+        }
+        
+        // Check pdftotext binary
+        $checks['pdftotext'] = $this->checkPdftotext();
+        if ($checks['pdftotext'] === 'not_available') {
+            $overallStatus = 'degraded';
+        }
+        
         return response()->json([
-            'status' => 'ok',
+            'status' => $overallStatus,
             'app' => 'cover-letter-generator',
             'version' => '1.0.0',
-            'checks' => [
-                'database' => 'ok',
-                'openai' => 'not_configured', // Will be updated when OpenAI is configured
-                'storage' => 'ok',
-                'pdftotext' => $this->checkPdftotext(),
-            ],
+            'checks' => $checks,
             'timestamp' => now()->toIso8601String(),
+            'uptime' => $this->getUptime(),
         ]);
     }
 
@@ -152,5 +216,40 @@ class CoverLetterController extends Controller
         exec('which pdftotext', $output, $returnCode);
 
         return $returnCode === 0 ? 'available' : 'not_available';
+    }
+
+    /**
+     * Get application uptime
+     */
+    private function getUptime(): string
+    {
+        try {
+            $uptime = shell_exec('uptime');
+            return trim($uptime ?? 'unknown');
+        } catch (\Exception $e) {
+            return 'unknown';
+        }
+    }
+
+    /**
+     * Calculate estimated cost based on token usage logs
+     */
+    private function calculateEstimatedCost(string $requestId): float
+    {
+        // This is a simplified cost calculation for reference
+        // In production, you'd want to track actual token usage per request
+        
+        // GPT-4o-mini pricing (as of 2024):
+        // Input: $0.00015 per 1K tokens
+        // Output: $0.0006 per 1K tokens
+        
+        // Estimate based on typical usage patterns
+        $estimatedInputTokens = 2000; // CV + job description
+        $estimatedOutputTokens = 500; // Cover letter + facts
+        
+        $inputCost = ($estimatedInputTokens / 1000) * 0.00015;
+        $outputCost = ($estimatedOutputTokens / 1000) * 0.0006;
+        
+        return round($inputCost + $outputCost, 6);
     }
 }

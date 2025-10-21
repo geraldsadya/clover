@@ -35,11 +35,10 @@ class OpenAIClient
 
     /**
      * Make a chat completion request with exponential backoff retry
+     * @param array<int, array{role: string, content: string}> $messages
+     * @return array{content: string, usage: array{tokens_in: int, tokens_out: int, tokens_total: int}}
      */
-    /**
-     * @param  array<int, array{role: string, content: string}>  $messages
-     */
-    public function chat(array $messages, float $temperature = 0.5, int $maxRetries = 6): string
+    public function chat(array $messages, float $temperature = 0.5, int $maxRetries = 6): array
     {
         $attempt = 0;
         $delayMs = 600; // start at 0.6s
@@ -82,7 +81,20 @@ class OpenAIClient
                     throw new \Exception('OpenAI returned empty content');
                 }
 
-                return $content;
+                // Extract token usage information
+                $usage = $data['usage'] ?? [];
+                $tokensIn = $usage['prompt_tokens'] ?? 0;
+                $tokensOut = $usage['completion_tokens'] ?? 0;
+                $tokensTotal = $usage['total_tokens'] ?? ($tokensIn + $tokensOut);
+
+                return [
+                    'content' => $content,
+                    'usage' => [
+                        'tokens_in' => $tokensIn,
+                        'tokens_out' => $tokensOut,
+                        'tokens_total' => $tokensTotal,
+                    ]
+                ];
 
             } catch (RequestException $e) {
                 $code = $e->getResponse()?->getStatusCode();
