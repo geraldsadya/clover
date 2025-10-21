@@ -55,4 +55,22 @@ class GenerateCoverLetterRequest extends FormRequest
             'job_description.max' => 'Job description must not exceed 10,000 characters.',
         ];
     }
+
+    /**
+     * Handle a failed validation attempt.
+     */
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        $response = response()->json([
+            'success' => false,
+            'error' => [
+                'message' => 'Validation failed.',
+                'code' => 'VALIDATION_ERROR',
+                'request_id' => uniqid('req_', true)
+            ],
+            'errors' => $validator->errors()
+        ], 422);
+
+        throw new \Illuminate\Validation\ValidationException($validator, $response);
+    }
 }

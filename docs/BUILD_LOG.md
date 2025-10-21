@@ -26,13 +26,27 @@
 - [x] Laravel 11 project initialized
 - [x] Project structure created (golden/, docs/ directories)
 
+### Phase 1: Basic Scaffolding ✅
+- [x] **Ticket A: Scaffold & Routing** - COMPLETED
+  - [x] Routes: `/` (form), `/generate` (POST), `/healthz` (health check)
+  - [x] Blade form with PDF upload + textarea (responsive design)
+  - [x] Server-side validation: PDF ≤10MB, MIME type, job desc 50-10k chars
+  - [x] CSRF enabled on POST routes
+  - [x] Error responses formatted as JSON `{success: false, error: {...}}`
+  - [x] Alpine.js frontend with loading states
+  - [x] Rate limiting middleware (10 requests/hour)
+  - [x] Health check endpoint working
+  - [x] Dependencies installed: spatie/pdf-to-text, openai-php/client
+  - [x] Initial commit pushed to GitHub
+  - [x] **Ticket A Complete**: Basic Laravel scaffolding with form validation and JSON error responses - all tests passing
+
 ---
 
 ## Next Steps
 - [ ] Create GitHub issues A-K from backlog
-- [ ] Start Ticket A: Scaffold & Routing
-- [ ] Add required dependencies (spatie/pdf-to-text, openai-php/client)
-- [ ] Implement core services (PdfExtractor, CoverLetterGenerator)
+- [ ] Start Ticket B: PDF Extraction Service
+- [ ] Implement PdfExtractor with MIME + magic-byte validation
+- [ ] Add pdftotext integration and error handling
 
 ---
 
