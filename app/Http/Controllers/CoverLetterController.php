@@ -49,6 +49,11 @@ class CoverLetterController extends Controller
             if ($cvFile === null || is_array($cvFile)) {
                 throw new \Exception('CV file is required');
             }
+            // Check if pdftotext is available
+            if (!$this->isPdftotextAvailable()) {
+                throw new \Exception('PDF processing is not available in this environment. Please use the production version.');
+            }
+            
             $cvText = $this->pdfExtractor->extract($cvFile);
 
             // Extract facts from CV text (Stage 1)
@@ -254,5 +259,16 @@ class CoverLetterController extends Controller
         $outputCost = ($estimatedOutputTokens / 1000) * 0.0006;
         
         return round($inputCost + $outputCost, 6);
+    }
+
+    /**
+     * Check if pdftotext binary is available
+     */
+    private function isPdftotextAvailable(): bool
+    {
+        $output = [];
+        $returnCode = 0;
+        exec('which pdftotext 2>/dev/null', $output, $returnCode);
+        return $returnCode === 0;
     }
 }
