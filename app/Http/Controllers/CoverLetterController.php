@@ -58,8 +58,22 @@ class CoverLetterController extends Controller
             if (isset($facts['status']) && $facts['status'] === 'needs-manual') {
                 $duration = (microtime(true) - $startTime) * 1000;
                 
+                $reason = $facts['reason'] ?? 'unknown';
+                $details = $facts['details'] ?? '';
+                
+                // Provide specific, actionable error messages
+                $errorMessage = match($reason) {
+                    'not_a_cv' => 'This document does not appear to be a CV or resume. ' . 
+                                  ($details ? $details . '. ' : '') .
+                                  'Please upload a document that contains your work experience, skills, and education.',
+                    'invalid_structure' => 'Unable to extract CV information from this PDF. The document may not contain standard CV elements (name, experience, skills, education). Please upload a valid CV/resume.',
+                    default => 'Unable to process this PDF as a CV. Please ensure you upload a valid resume or curriculum vitae.'
+                };
+                
                 Log::warning('CV processing failed - needs manual', [
                     'request_id' => $requestId,
+                    'reason' => $reason,
+                    'details' => $details,
                     'duration_ms' => round($duration, 2),
                     'outcome' => 'cv_processing_failed'
                 ]);
@@ -67,7 +81,7 @@ class CoverLetterController extends Controller
                 return response()->json([
                     'success' => false,
                     'error' => [
-                        'message' => 'Unable to extract CV information from this PDF. The document may not be a CV, or it may not contain standard CV elements (name, experience, skills, education). Please upload a valid CV/resume in PDF format.',
+                        'message' => $errorMessage,
                         'code' => 'CV_PROCESSING_FAILED',
                         'request_id' => $requestId,
                     ],

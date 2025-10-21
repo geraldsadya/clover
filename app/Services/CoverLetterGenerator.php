@@ -44,6 +44,30 @@ class CoverLetterGenerator
             'cv_text_length' => strlen($cvText),
         ]);
 
+        // PRE-CHECK: Validate if this is actually a CV (zero-cost, deterministic)
+        $validation = $this->validateIsCV($cvText);
+        
+        Log::info('CV validation check completed', [
+            'request_id' => $requestId,
+            'cv_indicator_score' => $validation['score'],
+            'is_valid' => $validation['is_valid'],
+            'reason' => $validation['reason'],
+        ]);
+        
+        if (!$validation['is_valid']) {
+            Log::warning('Document rejected: Not a CV', [
+                'request_id' => $requestId,
+                'score' => $validation['score'],
+                'reason' => $validation['reason'],
+            ]);
+            
+            return [
+                'status' => 'needs-manual',
+                'reason' => 'not_a_cv',
+                'details' => $validation['reason'],
+            ];
+        }
+
         try {
             $facts = $this->performExtraction($cvText, $requestId);
 
@@ -69,6 +93,105 @@ class CoverLetterGenerator
 
             throw $e;
         }
+    }
+
+    /**
+     * Validate if the extracted text appears to be a CV/resume (deterministic, no AI cost)
+     * 
+     * @param string $text The extracted PDF text
+     * @return array{is_valid: bool, score: int, reason: string|null}
+     */
+    private function validateIsCV(string $text): array
+    {
+        $textLower = mb_strtolower($text);
+        $score = 0;
+        
+        // Strong CV indicators (weighted scoring)
+        $strongIndicators = [
+            'work experience' => 4,
+            'professional experience' => 4,
+            'employment history' => 4,
+            'curriculum vitae' => 5,
+            'resume' => 3,
+            'education' => 2,
+            'qualifications' => 2,
+            'technical skills' => 3,
+            'skills' => 2,
+        ];
+        
+        // Weak CV indicators (supporting evidence)
+        $weakIndicators = [
+            'references' => 1,
+            'profile' => 1,
+            'objective' => 1,
+            'summary' => 1,
+            'languages' => 1,
+            'certifications' => 1,
+            'projects' => 1,
+            'achievements' => 1,
+            'responsibilities' => 1,
+        ];
+        
+        // Non-CV document markers (penalties)
+        $nonCVIndicators = [
+            'memorandum of understanding' => -15,
+            'memorandum' => -8,
+            'agreement between' => -10,
+            'this agreement' => -8,
+            'terms and conditions' => -10,
+            'invoice' => -15,
+            'purchase order' => -15,
+            'contract' => -6,
+            'whereas' => -4,
+            'hereby' => -3,
+            'witnesseth' => -10,
+            'party of the first part' => -10,
+            'party of the second part' => -10,
+            'in consideration of' => -5,
+            'confidentiality agreement' => -10,
+            'non-disclosure' => -8,
+        ];
+        
+        // Calculate score for strong indicators
+        foreach ($strongIndicators as $keyword => $weight) {
+            if (str_contains($textLower, $keyword)) {
+                $score += $weight;
+            }
+        }
+        
+        // Calculate score for weak indicators
+        foreach ($weakIndicators as $keyword => $weight) {
+            if (str_contains($textLower, $keyword)) {
+                $score += $weight;
+            }
+        }
+        
+        // Apply penalties for non-CV markers
+        $detectedNonCVTerms = [];
+        foreach ($nonCVIndicators as $keyword => $penalty) {
+            if (str_contains($textLower, $keyword)) {
+                $score += $penalty;
+                $detectedNonCVTerms[] = $keyword;
+            }
+        }
+        
+        // Determine validity (threshold: need at least 5 points)
+        $isValid = $score >= 5;
+        $reason = null;
+        
+        if (!$isValid) {
+            if (!empty($detectedNonCVTerms)) {
+                $reason = 'Document contains legal/contract terminology: ' . implode(', ', array_slice($detectedNonCVTerms, 0, 3));
+            } else {
+                $reason = 'Document lacks standard CV sections (experience, skills, education)';
+            }
+        }
+        
+        return [
+            'is_valid' => $isValid,
+            'score' => $score,
+            'reason' => $reason,
+        ];
     }
 
     /**
@@ -214,15 +337,37 @@ class CoverLetterGenerator
     {
         $validator = Validator::make($facts, [
             'name' => 'required|string|max:255',
-            'skills' => 'present|array',
-            'experience' => 'present|array',
-            'education' => 'present|array',
+            'skills' => 'present|array|min:1',  // Must have at least 1 skill
+            'experience' => 'present|array|min:1',  // Must have at least 1 work experience
+            'education' => 'present|array|min:1',  // Must have at least 1 education entry
             'certifications' => 'present|array',
             'years_of_experience' => 'required|integer|min:0|max:50',
         ]);
 
         if ($validator->fails()) {
             throw new \Exception('Invalid facts schema: '.implode(', ', $validator->errors()->all()));
+        }
+        
+        // POST-EXTRACTION VALIDATION: Check if name looks like a person (not a legal entity)
+        $nameLower = mb_strtolower($facts['name']);
+        $nonPersonNames = ['party', 'agreement', 'memorandum', 'company', 'entity', 'contractor', 'vendor'];
+        
+        foreach ($nonPersonNames as $term) {
+            if (str_contains($nameLower, $term)) {
+                throw new \Exception('Document does not appear to be a personal CV/resume (name field contains: ' . $term . ')');
+            }
+        }
+        
+        // POST-EXTRACTION VALIDATION: Check if skills contain legal terminology
+        $legalTerms = ['whereas', 'hereby', 'witnesseth', 'party', 'agreement', 'contract', 'terms and conditions'];
+        
+        foreach ($facts['skills'] as $skill) {
+            $skillLower = mb_strtolower((string)$skill);
+            foreach ($legalTerms as $term) {
+                if (str_contains($skillLower, $term)) {
+                    throw new \Exception('Document contains legal terminology in skills section, not CV content');
+                }
+            }
         }
     }
 

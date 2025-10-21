@@ -13,6 +13,7 @@ An AI-powered web application that generates tailored cover letters from PDF CVs
 - **📄 PDF CV Processing**: Extract text from PDF files with comprehensive validation
 - **🤖 AI-Powered Generation**: Two-stage pipeline for accurate, non-hallucinated cover letters
 - **🛡️ Anti-Hallucination**: Golden test set ensures AI doesn't invent facts not in CV
+- **🔍 Smart CV Validation**: Zero-cost deterministic validation rejects non-CV documents (MOUs, contracts, invoices) before expensive AI calls
 - **📱 Modern UI**: Responsive design with Alpine.js and WCAG AA accessibility
 - **🔒 Production Ready**: PHPStan level 8, security headers, rate limiting, POPIA compliance
 - **⚡ Real-time Processing**: Live health checks, request tracking, cost estimation
@@ -22,9 +23,11 @@ An AI-powered web application that generates tailored cover letters from PDF CVs
 
 - **Backend**: Laravel 11, PHP 8.2+
 - **AI**: Azure OpenAI (GPT-4.1)
-- **Frontend**: Blade templates, Alpine.js, Tailwind CSS
+- **PDF Processing**: Smalot/PdfParser (pure PHP, no external dependencies)
+- **Frontend**: Blade templates, Alpine.js, Custom CSS
 - **Testing**: PHPUnit, Golden Test Set (5 CV/Job pairs)
 - **Quality**: PHPStan level 8, Laravel Pint
+- **Development**: Laravel Herd, Cursor AI with Claude 3.5 Sonnet
 - **CI/CD**: GitHub Actions
 - **Deployment**: Railway (RAILPACK builder)
 
@@ -32,9 +35,9 @@ An AI-powered web application that generates tailored cover letters from PDF CVs
 
 - PHP 8.2 or higher
 - Composer
-- Node.js (for frontend assets)
 - Azure OpenAI API key
-- PDF processing: `poppler-utils` (for `pdftotext`)
+- Laravel Herd (recommended) or local PHP environment
+- No external PDF dependencies required (uses Smalot/PdfParser)
 
 ## 🛠️ Installation
 
@@ -204,14 +207,21 @@ php scripts/eval.php
 
 ### Two-Stage AI Pipeline
 
-1. **Facts Extraction** (Stage 1)
+1. **CV Validation** (Pre-Stage)
+   - Zero-cost deterministic validation using keyword scoring
+   - Rejects non-CV documents (MOUs, contracts, invoices) before AI calls
+   - Saves API costs and improves user experience
+   - Detailed logging with validation scores
+
+2. **Facts Extraction** (Stage 1)
    - Extract structured facts from CV text
    - JSON schema validation
    - Anti-hallucination measures
+   - Post-extraction validation for legal terminology
 
-2. **Cover Letter Composition** (Stage 2)
+3. **Cover Letter Composition** (Stage 2)
    - Generate cover letter using only extracted facts
-   - Word count validation (150-300 words)
+   - Word count validation (100-450 words, flexible for experience level)
    - Company/role integration
 
 ### Security Features
@@ -362,7 +372,9 @@ This project is open-sourced software licensed under the [MIT license](https://o
 - **Laravel Framework**: The foundation of this application
 - **Azure OpenAI**: AI-powered cover letter generation
 - **Railway**: Seamless deployment platform
-- **Spatie**: PDF text extraction capabilities
+- **Smalot/PdfParser**: Pure PHP PDF text extraction
+- **Cursor AI**: AI-powered development with Claude 3.5 Sonnet
+- **Laravel Herd**: Local PHP development environment
 
 ## 📞 Support
 
