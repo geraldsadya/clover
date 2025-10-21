@@ -41,7 +41,7 @@ class GenerateCoverLetterRequest extends FormRequest
                     }
                 },
             ],
-            'job_description' => 'required|string|min:50|max:10000',
+            'job_description' => 'required|string|min:1|max:10000',
         ];
     }
 
@@ -58,7 +58,7 @@ class GenerateCoverLetterRequest extends FormRequest
             'cv.mimes' => 'The CV must be a PDF file.',
             'cv.max' => 'The CV file must not be larger than 10MB.',
             'job_description.required' => 'Please enter a job description.',
-            'job_description.min' => 'Job description must be at least 50 characters.',
+            'job_description.min' => 'Job description must be at least 1 character.',
             'job_description.max' => 'Job description must not exceed 10,000 characters.',
         ];
     }

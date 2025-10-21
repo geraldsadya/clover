@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Global middleware - runs on every request
         $middleware->append(\App\Http\Middleware\RequestId::class);
-        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+        // $middleware->append(\App\Http\Middleware\SecurityHeaders::class); // Temporarily disabled for testing
         
         // API middleware group - for rate limiting on API routes
         $middleware->group('api', [

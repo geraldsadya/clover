@@ -11,20 +11,15 @@
         
         <div class="form-group">
             <label for="cv">Upload Your CV (PDF)</label>
-            <div class="file-upload-area" id="fileUploadArea">
-                <input type="file" 
-                       id="cv" 
-                       name="cv" 
-                       accept=".pdf" 
-                       required
-                       style="display: none;">
-                <div id="uploadPlaceholder">
-                    <strong>Click to upload</strong> or drag and drop your PDF here
-                </div>
-                <div id="fileSelected" style="display: none;">
-                    <strong>Selected:</strong> <span id="fileName"></span>
-                </div>
-            </div>
+            
+            <!-- Simple file input - no hidden tricks -->
+            <input type="file" 
+                   id="cv" 
+                   name="cv" 
+                   accept=".pdf" 
+                   required
+                   style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 4px; font-size: 16px;">
+            
             <small>PDF up to 10MB</small>
         </div>
 
@@ -34,246 +29,155 @@
                       name="job_description" 
                       placeholder="Paste the job description here..." 
                       required
-                      rows="6"></textarea>
-            <small>Minimum 50 characters, maximum 10,000 characters</small>
+                      rows="6"
+                      style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 4px; font-size: 16px;"></textarea>
+            <small>Minimum 1 character, maximum 10,000 characters</small>
         </div>
 
         <div style="text-align: center;">
-            <button type="submit" id="submitBtn">
-                <span id="submitText">Generate Cover Letter</span>
-                <span id="submitLoading" style="display: none;">Generating...</span>
+            <button type="submit" id="submitBtn" style="background: #007cba; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">
+                Generate Cover Letter
             </button>
         </div>
     </form>
 
     <!-- Loading State -->
-    <div id="loadingState" class="loading" style="display: none;">
-        <div class="spinner"></div>
+    <div id="loadingState" style="display: none; text-align: center; padding: 20px;">
         <p>Generating your cover letter...</p>
     </div>
 
     <!-- Error Alert -->
-    <div id="errorAlert" class="error" style="display: none;">
+    <div id="errorAlert" style="display: none; background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin: 10px 0;">
         <span id="errorMessage"></span>
     </div>
 
     <!-- Result Card -->
-    <div id="resultCard" class="success" style="display: none;">
+    <div id="resultCard" style="display: none; background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin: 10px 0;">
         <h3>Generated Cover Letter</h3>
-        <div class="cover-letter-content" id="coverLetterContent"></div>
+        <div id="coverLetterContent" style="white-space: pre-line; line-height: 1.8; margin: 20px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: white;"></div>
         
-        <div class="word-count-badge" id="wordCountBadge"></div>
-        
-        <div class="result-actions">
-            <button id="copyBtn">
-                <span id="copyText">Copy to Clipboard</span>
-                <span id="copySuccess" style="display: none;">Copied!</span>
+        <div style="margin-top: 20px;">
+            <button onclick="copyToClipboard()" style="background: #007cba; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">
+                Copy to Clipboard
             </button>
-            <button id="resetBtn">Generate Another</button>
+            <button onclick="resetForm()" style="background: #6c757d; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
+                Generate Another
+            </button>
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="toast" style="display: none;">
-        <span id="toastMessage"></span>
-    </div>
-
     <!-- Privacy Notice -->
-    <div class="privacy-notice">
+    <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #666;">
         <p>Your CV is processed securely and never stored. Files are deleted immediately after generating your cover letter.</p>
         <p>We comply with POPIA (South African privacy law).</p>
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const fileUploadArea = document.getElementById('fileUploadArea');
-    const fileInput = document.getElementById('cv');
-    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
-    const fileSelected = document.getElementById('fileSelected');
-    const fileName = document.getElementById('fileName');
-    const form = document.getElementById('coverLetterForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const submitText = document.getElementById('submitText');
-    const submitLoading = document.getElementById('submitLoading');
-    const loadingState = document.getElementById('loadingState');
-    const errorAlert = document.getElementById('errorAlert');
-    const errorMessage = document.getElementById('errorMessage');
-    const resultCard = document.getElementById('resultCard');
-    const coverLetterContent = document.getElementById('coverLetterContent');
-    const wordCountBadge = document.getElementById('wordCountBadge');
-    const copyBtn = document.getElementById('copyBtn');
-    const copyText = document.getElementById('copyText');
-    const copySuccess = document.getElementById('copySuccess');
-    const resetBtn = document.getElementById('resetBtn');
-    const toast = document.getElementById('toast');
-    const toastMessage = document.getElementById('toastMessage');
-
-    // File upload click handler
-    fileUploadArea.addEventListener('click', function() {
-        fileInput.click();
+function copyToClipboard() {
+    const text = document.getElementById('coverLetterContent').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Cover letter copied to clipboard!');
+    }).catch(() => {
+        alert('Failed to copy to clipboard');
     });
+}
 
-    // File input change handler
-    fileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            fileName.textContent = file.name;
-            uploadPlaceholder.style.display = 'none';
-            fileSelected.style.display = 'block';
-        }
-    });
+function resetForm() {
+    document.getElementById('cv').value = '';
+    document.getElementById('job_description').value = '';
+    document.getElementById('resultCard').style.display = 'none';
+    document.getElementById('errorAlert').style.display = 'none';
+}
 
-    // Drag and drop handlers
-    fileUploadArea.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        fileUploadArea.classList.add('dragover');
-    });
+// Simple form submission
+document.getElementById('coverLetterForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const cvFile = document.getElementById('cv').files[0];
+    const jobDescription = document.getElementById('job_description').value.trim();
+    
+    if (!cvFile) {
+        alert('Please upload a CV file');
+        return;
+    }
+    
+    if (!jobDescription) {
+        alert('Please enter a job description');
+        return;
+    }
 
-    fileUploadArea.addEventListener('dragleave', function(e) {
-        e.preventDefault();
-        fileUploadArea.classList.remove('dragover');
-    });
+    if (jobDescription.length < 1) {
+        alert('Job description must be at least 1 character');
+        return;
+    }
 
-    fileUploadArea.addEventListener('drop', function(e) {
-        e.preventDefault();
-        fileUploadArea.classList.remove('dragover');
+    // Show loading
+    document.getElementById('loadingState').style.display = 'block';
+    document.getElementById('errorAlert').style.display = 'none';
+    document.getElementById('resultCard').style.display = 'none';
+
+    const formData = new FormData();
+    formData.append('cv', cvFile);
+    formData.append('job_description', jobDescription);
+    formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+
+    fetch('/generate', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('loadingState').style.display = 'none';
         
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            const file = files[0];
-            if (file.type === 'application/pdf') {
-                fileInput.files = files;
-                fileName.textContent = file.name;
-                uploadPlaceholder.style.display = 'none';
-                fileSelected.style.display = 'block';
-            } else {
-                showError('Please upload a PDF file');
-            }
-        }
-    });
-
-    // Form submission
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const cvFile = fileInput.files[0];
-        const jobDescription = document.getElementById('job_description').value.trim();
-        
-        if (!cvFile) {
-            showError('Please upload a CV file');
-            return;
-        }
-        
-        if (!jobDescription) {
-            showError('Please enter a job description');
-            return;
-        }
-
-        if (jobDescription.length < 50) {
-            showError('Job description must be at least 50 characters');
-            return;
-        }
-
-        // Show loading state
-        setLoading(true);
-        hideError();
-        hideResult();
-
-        try {
-            const formData = new FormData();
-            formData.append('cv', cvFile);
-            formData.append('job_description', jobDescription);
-            formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-
-            const response = await fetch('/generate', {
-                method: 'POST',
-                body: formData
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                showResult(data.data.cover_letter, data.data.word_count);
-            } else {
-                showError(data.error.message);
-            }
-        } catch (err) {
-            showError('An error occurred while processing your request. Please try again.');
-        } finally {
-            setLoading(false);
-        }
-    });
-
-    // Copy to clipboard
-    copyBtn.addEventListener('click', async function() {
-        try {
-            await navigator.clipboard.writeText(coverLetterContent.textContent);
-            copyText.style.display = 'none';
-            copySuccess.style.display = 'inline';
-            showToast('Cover letter copied to clipboard!');
-            
-            setTimeout(() => {
-                copyText.style.display = 'inline';
-                copySuccess.style.display = 'none';
-            }, 2000);
-        } catch (err) {
-            showToast('Failed to copy to clipboard');
-        }
-    });
-
-    // Reset form
-    resetBtn.addEventListener('click', function() {
-        hideResult();
-        hideError();
-        fileInput.value = '';
-        document.getElementById('job_description').value = '';
-        uploadPlaceholder.style.display = 'block';
-        fileSelected.style.display = 'none';
-    });
-
-    // Helper functions
-    function setLoading(loading) {
-        if (loading) {
-            submitBtn.disabled = true;
-            submitText.style.display = 'none';
-            submitLoading.style.display = 'inline';
-            loadingState.style.display = 'block';
+        if (data.success) {
+            document.getElementById('coverLetterContent').textContent = data.data.cover_letter;
+            document.getElementById('resultCard').style.display = 'block';
         } else {
-            submitBtn.disabled = false;
-            submitText.style.display = 'inline';
-            submitLoading.style.display = 'none';
-            loadingState.style.display = 'none';
+            let errorMsg = data.error.message;
+            if (data.errors) {
+                // Show specific validation errors
+                const errors = [];
+                if (data.errors.cv) errors.push(...data.errors.cv);
+                if (data.errors.job_description) errors.push(...data.errors.job_description);
+                if (errors.length > 0) {
+                    errorMsg = errors.join(', ');
+                }
+            }
+            document.getElementById('errorMessage').textContent = errorMsg;
+            document.getElementById('errorAlert').style.display = 'block';
         }
-    }
-
-    function showError(message) {
-        errorMessage.textContent = message;
-        errorAlert.style.display = 'block';
-    }
-
-    function hideError() {
-        errorAlert.style.display = 'none';
-    }
-
-    function showResult(coverLetter, wordCount) {
-        coverLetterContent.textContent = coverLetter;
-        wordCountBadge.textContent = `${wordCount} words`;
-        resultCard.style.display = 'block';
-    }
-
-    function hideResult() {
-        resultCard.style.display = 'none';
-    }
-
-    function showToast(message) {
-        toastMessage.textContent = message;
-        toast.style.display = 'block';
-        
-        setTimeout(() => {
-            toast.style.display = 'none';
-        }, 3000);
-    }
+    })
+    .catch(err => {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('errorMessage').textContent = 'An error occurred while processing your request. Please try again.';
+        document.getElementById('errorAlert').style.display = 'block';
+    });
 });
 </script>
+
+<style>
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+small {
+    color: #666;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+</style>
 @endsection
