@@ -30,6 +30,10 @@ class GenerateCoverLetterRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     // Magic-byte validation for PDF
                     $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                    if ($finfo === false) {
+                        $fail('Unable to validate file type.');
+                        return;
+                    }
                     $mimeType = finfo_file($finfo, $value->getPathname());
                     if ($mimeType !== 'application/pdf') {
                         $fail('File must be a valid PDF.');
@@ -42,6 +46,7 @@ class GenerateCoverLetterRequest extends FormRequest
 
     /**
      * Get custom error messages for validation rules.
+     * @return array<string, string>
      */
     public function messages(): array
     {

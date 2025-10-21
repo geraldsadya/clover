@@ -19,7 +19,7 @@ class CoverLetterController extends Controller
     /**
      * Display the cover letter generation form
      */
-    public function index(): View
+    public function index(): \Illuminate\Contracts\View\View
     {
         return view('cover-letter.index');
     }
@@ -34,7 +34,11 @@ class CoverLetterController extends Controller
 
         try {
             // Extract text from PDF
-            $cvText = $this->pdfExtractor->extract($request->file('cv'));
+            $cvFile = $request->file('cv');
+            if ($cvFile === null || is_array($cvFile)) {
+                throw new \Exception('CV file is required');
+            }
+            $cvText = $this->pdfExtractor->extract($cvFile);
             
             // Extract facts from CV text (Stage 1)
             $facts = $this->coverLetterGenerator->extractFacts($cvText);

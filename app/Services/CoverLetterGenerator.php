@@ -243,20 +243,52 @@ class CoverLetterGenerator
      * Generate cover letter from facts and job description (Stage 2)
      * This will be implemented in Ticket E
      * @param array<string, mixed> $facts
+     * @param string $jobDescription Raw job description (will be sanitized internally)
      */
     public function generateCoverLetter(array $facts, string $jobDescription): string
     {
+        // Sanitize job description before AI processing
+        $sanitizedJobDescription = $this->sanitizeJobDescription($jobDescription);
+        
         // Placeholder - will be implemented in Ticket E
         return 'Cover letter generation will be implemented in Ticket E';
     }
 
     /**
-     * Sanitize job description input
-     * This will be implemented in Ticket D
+     * Sanitize job description input before AI processing
+     * 
+     * @param string $jobDescription Raw job description input
+     * @return string Sanitized job description
      */
     public function sanitizeJobDescription(string $jobDescription): string
     {
-        // Placeholder - will be implemented in Ticket D
-        return $jobDescription;
+        // Strip HTML tags but preserve spaces
+        $sanitized = strip_tags($jobDescription);
+        
+        // Remove UTM tracking parameters (common patterns) - be more careful with URL structure
+        $sanitized = preg_replace('/[?&]utm_[^&\s]*/', '', $sanitized) ?? $sanitized;
+        $sanitized = preg_replace('/[?&](fbclid|gclid|msclkid)=[^&\s]*/', '', $sanitized) ?? $sanitized;
+        
+        // Clean up any double ampersands or question marks that might be left
+        $sanitized = preg_replace('/[?&]+/', '&', $sanitized) ?? $sanitized;
+        $sanitized = preg_replace('/^&/', '?', $sanitized) ?? $sanitized;
+        
+        // Normalize whitespace (replace multiple spaces/newlines with single space)
+        $sanitized = preg_replace('/\s+/', ' ', $sanitized) ?? $sanitized;
+        
+        // Trim whitespace
+        $sanitized = trim($sanitized);
+        
+        // Cap length to 10k chars (keep first 10k chars)
+        if (strlen($sanitized) > 10000) {
+            $sanitized = substr($sanitized, 0, 10000);
+            // Ensure we don't cut off in the middle of a word
+            $lastSpace = strrpos($sanitized, ' ');
+            if ($lastSpace !== false && $lastSpace > 9500) {
+                $sanitized = substr($sanitized, 0, $lastSpace);
+            }
+        }
+        
+        return $sanitized;
     }
 }

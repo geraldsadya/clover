@@ -63,6 +63,7 @@
   - [x] Comprehensive unit tests (10 test cases)
   - [x] PHPStan level 8 compliance with proper type annotations
   - [x] **Ticket C Complete**: Facts extraction service with robust error handling and anti-hallucination measures
+  - [x] **Ticket D Complete**: Job ad sanitization with HTML stripping, UTM removal, and length capping
 
 ---
 
