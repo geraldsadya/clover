@@ -11,7 +11,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Global middleware - runs on every request
+        $middleware->append(\App\Http\Middleware\RequestId::class);
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+        
+        // API middleware group - for rate limiting on API routes
+        $middleware->group('api', [
+            \App\Http\Middleware\RateLimiting::class,
+        ]);
+        
+        // Web middleware group - for rate limiting on web routes
+        $middleware->group('web', [
+            \App\Http\Middleware\RateLimiting::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

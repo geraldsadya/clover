@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\GenerateCoverLetterRequest;
 use App\Services\CoverLetterGenerator;
+use App\Services\OpenAIClient;
 use App\Services\PdfExtractor;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CoverLetterController extends Controller
 {
@@ -27,8 +30,15 @@ class CoverLetterController extends Controller
      */
     public function generate(GenerateCoverLetterRequest $request): JsonResponse
     {
-        $requestId = uniqid('req_', true);
+        $requestId = $request->header('X-Request-ID', 'unknown');
         $startTime = microtime(true);
+
+        // Log request start (NO PII)
+        Log::info('Cover letter generation started', [
+            'request_id' => $requestId,
+            'cv_file_size' => is_array($request->file('cv')) ? 0 : ($request->file('cv')?->getSize() ?? 0),
+            'job_description_length' => strlen($request->input('job_description', '')),
+        ]);
 
         try {
             // Extract text from PDF
@@ -43,6 +53,14 @@ class CoverLetterController extends Controller
 
             // Check if extraction failed and needs manual processing
             if (isset($facts['status']) && $facts['status'] === 'needs-manual') {
+                $duration = (microtime(true) - $startTime) * 1000;
+                
+                Log::warning('CV processing failed - needs manual', [
+                    'request_id' => $requestId,
+                    'duration_ms' => round($duration, 2),
+                    'outcome' => 'cv_processing_failed'
+                ]);
+
                 return response()->json([
                     'success' => false,
                     'error' => [
@@ -57,24 +75,39 @@ class CoverLetterController extends Controller
             $coverLetter = $this->coverLetterGenerator->generateCoverLetter($facts, $request->input('job_description'));
 
             $duration = (microtime(true) - $startTime) * 1000;
+            $wordCount = str_word_count($coverLetter);
+
+            // Log successful completion (NO PII)
+            Log::info('Cover letter generation completed', [
+                'request_id' => $requestId,
+                'duration_ms' => round($duration, 2),
+                'word_count' => $wordCount,
+                'cv_text_length' => strlen($cvText),
+                'outcome' => 'success'
+            ]);
 
             return response()->json([
                 'success' => true,
                 'data' => [
                     'cover_letter' => $coverLetter,
-                    'word_count' => str_word_count($coverLetter),
+                    'word_count' => $wordCount,
                     'request_id' => $requestId,
-                    'facts' => $facts,
-                    'cv_text_length' => strlen($cvText),
                 ],
                 'meta' => [
-                    'tokens_used' => 0, // Will be updated when OpenAI integration is complete
                     'processing_time_ms' => round($duration, 2),
                 ],
             ]);
 
         } catch (\Exception $e) {
             $duration = (microtime(true) - $startTime) * 1000;
+
+            // Log error (NO PII)
+            Log::error('Cover letter generation failed', [
+                'request_id' => $requestId,
+                'duration_ms' => round($duration, 2),
+                'error_message' => $e->getMessage(),
+                'outcome' => 'error'
+            ]);
 
             return response()->json([
                 'success' => false,
