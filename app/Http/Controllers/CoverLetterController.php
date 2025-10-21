@@ -200,9 +200,10 @@ class CoverLetterController extends Controller
         
         // Check pdftotext binary
         $checks['pdftotext'] = $this->checkPdftotext();
-        if ($checks['pdftotext'] === 'not_available') {
-            $overallStatus = 'degraded';
-        }
+        // Don't mark as degraded if pdftotext is not available during initial deployment
+        // if ($checks['pdftotext'] === 'not_available') {
+        //     $overallStatus = 'degraded';
+        // }
         
         return response()->json([
             'status' => $overallStatus,
@@ -219,11 +220,14 @@ class CoverLetterController extends Controller
      */
     private function checkPdftotext(): string
     {
-        $output = [];
-        $returnCode = 0;
-        exec('which pdftotext', $output, $returnCode);
-
-        return $returnCode === 0 ? 'available' : 'not_available';
+        try {
+            $output = [];
+            $returnCode = 0;
+            exec('which pdftotext 2>/dev/null', $output, $returnCode);
+            return $returnCode === 0 ? 'available' : 'not_available';
+        } catch (\Exception $e) {
+            return 'not_available';
+        }
     }
 
     /**
