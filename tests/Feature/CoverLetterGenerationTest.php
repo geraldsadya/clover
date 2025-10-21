@@ -134,6 +134,11 @@ class CoverLetterGenerationTest extends TestCase
     /** @test */
     public function it_returns_placeholder_response_with_valid_input()
     {
+        // Skip this test if pdftotext is not available
+        if (!$this->isPdftotextAvailable()) {
+            $this->markTestSkipped('pdftotext binary not available');
+        }
+
         // Create a fake PDF file with proper PDF headers
         $pdfContent = "%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Kids [3 0 R]\n/Count 1\n>>\nendobj\n3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n/MediaBox [0 0 612 792]\n>>\nendobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \ntrailer\n<<\n/Size 4\n/Root 1 0 R\n>>\nstartxref\n174\n%%EOF";
         
@@ -148,7 +153,7 @@ class CoverLetterGenerationTest extends TestCase
         $response->assertJson([
             'success' => true,
             'data' => [
-                'cover_letter' => 'This is a placeholder cover letter. The actual implementation will extract text from the PDF and generate a tailored cover letter using AI.',
+                'cover_letter' => 'This is a placeholder cover letter. The actual implementation will generate a tailored cover letter using AI based on the extracted CV text and job description.',
                 'word_count' => 25,
                 'request_id' => true // Just check it exists
             ],
@@ -178,5 +183,16 @@ class CoverLetterGenerationTest extends TestCase
         $response->assertJsonStructure([
             'timestamp'
         ]);
+    }
+
+    /**
+     * Check if pdftotext binary is available
+     */
+    private function isPdftotextAvailable(): bool
+    {
+        $output = [];
+        $returnCode = 0;
+        exec('which pdftotext', $output, $returnCode);
+        return $returnCode === 0;
     }
 }

@@ -40,13 +40,24 @@
   - [x] Initial commit pushed to GitHub
   - [x] **Ticket A Complete**: Basic Laravel scaffolding with form validation and JSON error responses - all tests passing
 
+### Phase 2: PDF Extraction Service ✅
+- [x] **Ticket B: PDF Extraction Service** - COMPLETED
+  - [x] MIME type validation (`finfo_file`)
+  - [x] Magic-byte validation (`%PDF-`)
+  - [x] Extract text using `spatie/pdf-to-text`
+  - [x] Normalize whitespace, cap at ~15k chars (keep first 80%, last 20%)
+  - [x] Temp files stored in `storage/app/temp/`, deleted immediately post-extraction
+  - [x] Custom exceptions: `PdfExtractionException` for scanned, corrupt, encrypted, empty PDFs
+  - [x] Tests: valid PDF extracts text, edge cases throw exceptions, files deleted
+  - [x] **Ticket B Complete**: PDF extraction service with comprehensive error handling and temp file management - all tests passing
+
 ---
 
 ## Next Steps
 - [ ] Create GitHub issues A-K from backlog
-- [ ] Start Ticket B: PDF Extraction Service
-- [ ] Implement PdfExtractor with MIME + magic-byte validation
-- [ ] Add pdftotext integration and error handling
+- [ ] Start Ticket C: Facts JSON Extraction (Stage 1)
+- [ ] Implement two-stage AI pipeline: extract facts → compose letter
+- [ ] Add OpenAI integration with proper error handling
 
 ---
 
