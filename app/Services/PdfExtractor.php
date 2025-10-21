@@ -56,14 +56,21 @@ class PdfExtractor
     {
         // MIME type validation
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mimeType = finfo_file($finfo, $file->getPathname());
+        if ($finfo === false) {
+            throw PdfExtractionException::invalidPdf();
+        }
         
+        $mimeType = finfo_file($finfo, $file->getPathname());
         if ($mimeType !== 'application/pdf') {
             throw PdfExtractionException::invalidPdf();
         }
 
         // Magic-byte validation
         $handle = fopen($file->getPathname(), 'rb');
+        if ($handle === false) {
+            throw PdfExtractionException::invalidPdf();
+        }
+        
         $header = fread($handle, 5);
         fclose($handle);
         
@@ -80,7 +87,12 @@ class PdfExtractor
         $filename = uniqid('pdf_', true) . '.pdf';
         $path = 'temp/' . $filename;
         
-        Storage::disk('local')->put($path, file_get_contents($file->getPathname()));
+        $content = file_get_contents($file->getPathname());
+        if ($content === false) {
+            throw PdfExtractionException::invalidPdf();
+        }
+        
+        Storage::disk('local')->put($path, $content);
         
         return Storage::disk('local')->path($path);
     }
@@ -118,10 +130,10 @@ class PdfExtractor
     private function clean(string $text): string
     {
         // Normalize whitespace
-        $text = preg_replace('/\s+/', ' ', $text);
+        $text = preg_replace('/\s+/', ' ', $text) ?? $text;
         
         // Remove control characters except newlines
-        $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $text);
+        $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $text) ?? $text;
         
         // Trim whitespace
         return trim($text);
