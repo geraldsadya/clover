@@ -49,7 +49,7 @@
   - [x] Temp files stored in `storage/app/temp/`, deleted immediately post-extraction
   - [x] Custom exceptions: `PdfExtractionException` for scanned, corrupt, encrypted, empty PDFs
   - [x] Tests: valid PDF extracts text, edge cases throw exceptions, files deleted
-  - [x] **Ticket B Complete**: PDF extraction service with comprehensive error handling and temp file management - all tests passing
+  - [x] **Ticket B Complete**: PDF extraction service with comprehensive error handling, temp file management, and PHPStan level 8 compliance - all tests passing
 
 ---
 
