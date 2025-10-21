@@ -4,18 +4,58 @@ namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
+use Smalot\PdfParser\Parser;
 
 class PdfExtractor
 {
     /**
-     * Extract text from PDF using client-side PDF.js
-     * This is a fallback when pdftotext is not available
+     * Extract text from PDF using Smalot/PdfParser (pure PHP)
      */
     public function extract(UploadedFile $file): string
     {
-        // For now, return a placeholder that indicates PDF.js should be used
-        // The actual extraction will happen on the client side
-        return "PDF_EXTRACTION_REQUIRED";
+        try {
+            // Use the file's temporary path directly
+            $fullPath = $file->getPathname();
+            
+            // Ensure the file exists
+            if (!file_exists($fullPath)) {
+                throw new PdfExtractionException('Temporary file was not created properly.');
+            }
+            
+            // Parse PDF using Smalot/PdfParser
+            $parser = new Parser();
+            $pdf = $parser->parseFile($fullPath);
+            $text = $pdf->getText();
+            
+            // Clean and fix UTF-8 encoding
+            $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
+            $text = filter_var($text, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
+            
+            if (empty(trim($text))) {
+                throw new PdfExtractionException('Could not extract text from PDF. The PDF might be scanned or corrupted.');
+            }
+            
+            // Normalize whitespace and truncate if too long
+            $text = preg_replace('/\s+/', ' ', $text);
+            $text = trim($text);
+            
+            if (strlen($text) > 15000) {
+                // Keep first 80% and last 20% to preserve important info
+                $firstPart = substr($text, 0, 12000);
+                $lastPart = substr($text, -3000);
+                $text = $firstPart . ' ... ' . $lastPart;
+            }
+            
+            return $text;
+            
+        } catch (\Exception $e) {
+            // Clean up temp file if it exists
+            if (isset($fullPath) && file_exists($fullPath)) {
+                unlink($fullPath);
+            }
+            
+            throw new PdfExtractionException('PDF extraction failed: ' . $e->getMessage());
+        }
     }
 
     /**

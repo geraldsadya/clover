@@ -143,6 +143,10 @@ class CoverLetterGenerator
      */
     private function buildExtractionPrompt(string $cvText, int $attempt): string
     {
+        // Clean and fix UTF-8 encoding
+        $cvText = mb_convert_encoding($cvText, 'UTF-8', 'UTF-8');
+        $cvText = filter_var($cvText, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
+        
         $basePrompt = "Extract the following information from this CV text and return ONLY valid JSON with no additional text:\n\n";
 
         $schema = [
@@ -454,6 +458,10 @@ class CoverLetterGenerator
      */
     private function buildCompositionPrompt(array $facts, string $sanitizedJobDescription, array $companyAndRole, int $attempt): string
     {
+        // Clean and fix UTF-8 encoding for job description
+        $sanitizedJobDescription = mb_convert_encoding($sanitizedJobDescription, 'UTF-8', 'UTF-8');
+        $sanitizedJobDescription = filter_var($sanitizedJobDescription, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
+        
         $basePrompt = "Write a professional cover letter for {$companyAndRole['role']} at {$companyAndRole['company']}.\n\n";
 
         $basePrompt .= "REQUIREMENTS:\n";

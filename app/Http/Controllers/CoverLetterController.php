@@ -49,11 +49,6 @@ class CoverLetterController extends Controller
             if ($cvFile === null || is_array($cvFile)) {
                 throw new \Exception('CV file is required');
             }
-            // Check if pdftotext is available
-            if (!$this->isPdftotextAvailable()) {
-                throw new \Exception('PDF processing is not available in this environment. Please use the production version.');
-            }
-            
             $cvText = $this->pdfExtractor->extract($cvFile);
 
             // Extract facts from CV text (Stage 1)
@@ -146,13 +141,52 @@ class CoverLetterController extends Controller
      */
     public function healthz(): JsonResponse
     {
-        // Simple healthcheck that always returns OK for Railway deployment
+        $checks = [];
+        $overallStatus = 'ok';
+        
+        // Check database connectivity
+        try {
+            DB::connection()->getPdo();
+            $checks['database'] = 'ok';
+        } catch (\Exception $e) {
+            $checks['database'] = 'error';
+            $overallStatus = 'degraded';
+        }
+        
+        // Check storage accessibility
+        try {
+            $testFile = 'health-check-test-' . uniqid();
+            Storage::put($testFile, 'test');
+            Storage::delete($testFile);
+            $checks['storage'] = 'ok';
+        } catch (\Exception $e) {
+            $checks['storage'] = 'error';
+            $overallStatus = 'degraded';
+        }
+        
+        // Check pdftotext binary (informational only)
+        $checks['pdftotext'] = $this->checkPdftotext();
+        
+        // Check OpenAI API (informational only - don't fail healthcheck)
+        try {
+            $openaiKey = env('OPENAI_API_KEY');
+            $openaiBase = env('OPENAI_BASE');
+            
+            if (empty($openaiKey) || empty($openaiBase)) {
+                $checks['openai'] = 'not_configured';
+            } else {
+                $checks['openai'] = 'configured';
+            }
+        } catch (\Exception $e) {
+            $checks['openai'] = 'error';
+        }
+        
         return response()->json([
-            'status' => 'ok',
+            'status' => $overallStatus,
             'app' => 'cover-letter-generator',
             'version' => '1.0.0',
+            'checks' => $checks,
             'timestamp' => now()->toIso8601String(),
-            'message' => 'Application is running'
         ]);
     }
 
