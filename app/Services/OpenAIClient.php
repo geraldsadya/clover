@@ -14,10 +14,22 @@ class OpenAIClient
 
     public function __construct()
     {
-        $this->http = new Client([
-            'base_uri' => env('OPENAI_BASE', 'https://api.openai.com') . '/v1/',
-            'timeout' => 60,
-        ]);
+        // Support both OpenAI and Azure OpenAI
+        $baseUrl = env('OPENAI_BASE', 'https://api.openai.com');
+        if (str_contains($baseUrl, 'openai.azure.com')) {
+            // Azure OpenAI format: https://your-resource.openai.azure.com/openai/deployments/your-deployment
+            $this->http = new Client([
+                'base_uri' => $baseUrl . '/',
+                'timeout' => 60,
+            ]);
+        } else {
+            // Standard OpenAI format
+            $this->http = new Client([
+                'base_uri' => $baseUrl . '/v1/',
+                'timeout' => 60,
+            ]);
+        }
+        
         $this->model = env('MODEL', 'gpt-4o-mini');
         $this->apiKey = env('OPENAI_API_KEY');
     }
