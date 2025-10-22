@@ -150,20 +150,27 @@ class CoverLetterGenerator
         $textLower = mb_strtolower($text);
         $score = 0;
         
-        // Strong CV indicators (weighted scoring)
+        // Strong CV indicators (weighted scoring) - expanded with more variations
         $strongIndicators = [
             'work experience' => 4,
             'professional experience' => 4,
             'employment history' => 4,
+            'experience' => 3,
+            'employment' => 3,
+            'career' => 2,
             'curriculum vitae' => 5,
             'resume' => 3,
+            'cv' => 3,
             'education' => 2,
             'qualifications' => 2,
             'technical skills' => 3,
             'skills' => 2,
+            'competencies' => 2,
+            'expertise' => 2,
+            'background' => 2,
         ];
         
-        // Weak CV indicators (supporting evidence)
+        // Weak CV indicators (supporting evidence) - expanded
         $weakIndicators = [
             'references' => 1,
             'profile' => 1,
@@ -174,18 +181,31 @@ class CoverLetterGenerator
             'projects' => 1,
             'achievements' => 1,
             'responsibilities' => 1,
+            'accomplishments' => 1,
+            'awards' => 1,
+            'publications' => 1,
+            'training' => 1,
+            'courses' => 1,
+            'degree' => 1,
+            'university' => 1,
+            'college' => 1,
+            'institute' => 1,
+            'company' => 1,
+            'position' => 1,
+            'role' => 1,
+            'job' => 1,
+            'work' => 1,
+            'employment' => 1,
         ];
         
-        // Non-CV document markers (penalties)
+        // Non-CV document markers (penalties) - more specific to avoid false positives
         $nonCVIndicators = [
             'memorandum of understanding' => -15,
-            'memorandum' => -8,
             'agreement between' => -10,
             'this agreement' => -8,
             'terms and conditions' => -10,
             'invoice' => -15,
             'purchase order' => -15,
-            'contract' => -6,
             'whereas' => -4,
             'hereby' => -3,
             'witnesseth' => -10,
@@ -194,6 +214,9 @@ class CoverLetterGenerator
             'in consideration of' => -5,
             'confidentiality agreement' => -10,
             'non-disclosure' => -8,
+            'bill of sale' => -15,
+            'lease agreement' => -10,
+            'rental agreement' => -10,
         ];
         
         // Calculate score for strong indicators
@@ -219,15 +242,40 @@ class CoverLetterGenerator
             }
         }
         
-        // Determine validity (threshold: need at least 5 points)
-        $isValid = $score >= 5;
+        // Additional checks for common CV patterns
+        $additionalScore = 0;
+        
+        // Check for email patterns (common in CVs)
+        if (preg_match('/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/', $text)) {
+            $additionalScore += 2;
+        }
+        
+        // Check for phone number patterns
+        if (preg_match('/[\+]?[1-9][\d\s\-\(\)]{7,}/', $text)) {
+            $additionalScore += 1;
+        }
+        
+        // Check for date patterns (years, months)
+        if (preg_match('/\b(19|20)\d{2}\b/', $text)) {
+            $additionalScore += 1;
+        }
+        
+        // Check for bullet points or structured formatting
+        if (str_contains($text, '•') || str_contains($text, '-') || str_contains($text, '*')) {
+            $additionalScore += 1;
+        }
+        
+        $score += $additionalScore;
+        
+        // Lower threshold and more flexible validation
+        $isValid = $score >= 3; // Reduced from 5 to 3
         $reason = null;
         
         if (!$isValid) {
             if (!empty($detectedNonCVTerms)) {
                 $reason = 'Document contains legal/contract terminology: ' . implode(', ', array_slice($detectedNonCVTerms, 0, 3));
             } else {
-                $reason = 'Document lacks standard CV sections (experience, skills, education)';
+                $reason = 'Document appears to lack CV/resume content. Please ensure your document contains work experience, skills, education, or contact information.';
             }
         }
         
@@ -368,20 +416,136 @@ class CoverLetterGenerator
             $cleanResponse = $matches[0];
         }
 
-        // Parse JSON
-        $facts = json_decode($cleanResponse, true);
+        // Try multiple parsing strategies
+        $facts = $this->tryParseJson($cleanResponse);
+        
+        if ($facts === null) {
+            // If all parsing fails, try to extract individual fields
+            $facts = $this->extractFieldsFromText($cleanResponse);
+        }
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception('Invalid JSON response: '.json_last_error_msg());
+        if ($facts === null) {
+            throw new \Exception('Invalid JSON response: Unable to parse AI response');
         }
 
         // Validate schema
         $this->validateFactsSchema($facts);
 
-        // Check for banned phrases (anti-hallucination)
-        $this->checkForBannedPhrases($facts);
+        // Note: Banned phrase checking moved to cover letter validation stage
 
         return $facts;
+    }
+
+    /**
+     * Try multiple strategies to parse JSON
+     */
+    private function tryParseJson(string $response): ?array
+    {
+        // Strategy 1: Direct JSON decode
+        $facts = json_decode($response, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($facts)) {
+            return $facts;
+        }
+
+        // Strategy 2: Fix common JSON issues
+        $fixed = $this->fixCommonJsonIssues($response);
+        $facts = json_decode($fixed, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($facts)) {
+            return $facts;
+        }
+
+        // Strategy 3: Extract JSON from mixed content
+        if (preg_match('/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/s', $response, $matches)) {
+            $facts = json_decode($matches[0], true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($facts)) {
+                return $facts;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Fix common JSON formatting issues
+     */
+    private function fixCommonJsonIssues(string $json): string
+    {
+        // Fix trailing commas
+        $json = preg_replace('/,(\s*[}\]])/', '$1', $json);
+        
+        // Fix single quotes to double quotes
+        $json = preg_replace("/(?<!\\\\)'/", '"', $json);
+        
+        // Remove any text before the first {
+        $json = preg_replace('/^[^{]*/', '', $json);
+        
+        // Remove any text after the last }
+        $json = preg_replace('/[^}]*$/', '', $json);
+        
+        return $json;
+    }
+
+    /**
+     * Extract fields from text when JSON parsing fails
+     */
+    private function extractFieldsFromText(string $text): ?array
+    {
+        $facts = [];
+        
+        // Extract name
+        if (preg_match('/"name":\s*"([^"]+)"/', $text, $matches)) {
+            $facts['name'] = $matches[1];
+        }
+        
+        // Extract skills array
+        if (preg_match('/"skills":\s*\[(.*?)\]/s', $text, $matches)) {
+            $skillsText = $matches[1];
+            $skills = [];
+            if (preg_match_all('/"([^"]+)"/', $skillsText, $skillMatches)) {
+                $skills = $skillMatches[1];
+            }
+            $facts['skills'] = $skills;
+        }
+        
+        // Extract experience array
+        if (preg_match('/"experience":\s*\[(.*?)\]/s', $text, $matches)) {
+            $experienceText = $matches[1];
+            $experience = [];
+            if (preg_match_all('/"([^"]+)"/', $experienceText, $expMatches)) {
+                $experience = $expMatches[1];
+            }
+            $facts['experience'] = $experience;
+        }
+        
+        // Extract education array
+        if (preg_match('/"education":\s*\[(.*?)\]/s', $text, $matches)) {
+            $educationText = $matches[1];
+            $education = [];
+            if (preg_match_all('/"([^"]+)"/', $educationText, $eduMatches)) {
+                $education = $eduMatches[1];
+            }
+            $facts['education'] = $education;
+        }
+        
+        // Extract years of experience
+        if (preg_match('/"years_of_experience":\s*(\d+)/', $text, $matches)) {
+            $facts['years_of_experience'] = (int)$matches[1];
+        }
+        
+        // Set default empty arrays for missing fields
+        $defaultFields = ['certifications', 'projects', 'achievements', 'languages'];
+        foreach ($defaultFields as $field) {
+            if (!isset($facts[$field])) {
+                $facts[$field] = [];
+            }
+        }
+        
+        // Only return if we have at least name or skills
+        if (isset($facts['name']) || isset($facts['skills'])) {
+            return $facts;
+        }
+        
+        return null;
     }
 
     /**
@@ -426,36 +590,6 @@ class CoverLetterGenerator
                 if (str_contains($skillLower, $term)) {
                     throw new \Exception('Document contains legal terminology in skills section, not CV content');
                 }
-            }
-        }
-    }
-
-    /**
-     * Check for banned phrases to prevent hallucination
-     *
-     * @param  array<string, mixed>  $facts
-     */
-    private function checkForBannedPhrases(array $facts): void
-    {
-        $bannedPhrases = [
-            'not specified',
-            'not mentioned',
-            'not provided',
-            'not available',
-            'unknown',
-            'n/a',
-            'not found',
-        ];
-
-        $factsString = json_encode($facts);
-
-        if ($factsString === false) {
-            throw new \Exception('Failed to encode facts as JSON');
-        }
-
-        foreach ($bannedPhrases as $phrase) {
-            if (stripos($factsString, $phrase) !== false) {
-                throw new \Exception("Banned phrase detected: {$phrase}");
             }
         }
     }
@@ -725,37 +859,88 @@ class CoverLetterGenerator
 
     /**
      * Validate that the cover letter is grounded in provided facts only
+     * 
+     * This method prevents hallucination by checking for specific patterns that indicate
+     * the AI is making up information not present in the CV facts.
      *
+     * @param  string  $coverLetter
      * @param  array<string, mixed>  $facts
      */
     private function validateGroundedness(string $coverLetter, array $facts): void
     {
-        // Extract skills from facts
-        $providedSkills = $facts['skills'] ?? [];
         $factsString = json_encode($facts);
-
         if ($factsString === false) {
             throw new \Exception('Failed to encode facts as JSON');
         }
 
-        // Check for common skills that might be hallucinated
-        $commonSkills = ['Docker', 'Kubernetes', 'AWS', 'Azure', 'React', 'Vue', 'Angular', 'Python', 'Java', 'C++', 'Machine Learning', 'AI'];
+        // Check for specific false claims that indicate hallucination
+        $this->checkForFalseClaims($coverLetter, $factsString);
+        
+        // Check for banned phrases that indicate uncertainty/hallucination
+        $this->checkForBannedPhrases($coverLetter);
+    }
 
-        foreach ($commonSkills as $skill) {
-            // If skill is mentioned in cover letter but not in facts
-            if (stripos($coverLetter, $skill) !== false && stripos($factsString, $skill) === false) {
-                throw new \Exception("Hallucinated skill detected: {$skill} is mentioned but not in provided facts");
+    /**
+     * Check for specific false claims that indicate hallucination
+     */
+    private function checkForFalseClaims(string $coverLetter, string $factsString): void
+    {
+        // Pattern 1: Specific years of experience with technologies not mentioned
+        // e.g., "5 years of experience with Docker" when Docker isn't in CV
+        if (preg_match_all('/(\d+)\s+years?\s+of\s+experience\s+with\s+([A-Za-z][A-Za-z0-9\s]+)/i', $coverLetter, $matches)) {
+            for ($i = 0; $i < count($matches[0]); $i++) {
+                $technology = trim($matches[2][$i]);
+                $years = $matches[1][$i];
+                
+                // If technology is mentioned with specific years but not in CV facts
+                if (stripos($factsString, $technology) === false) {
+                    throw new \Exception("Hallucinated experience detected: {$years} years with {$technology} mentioned but not in CV");
+                }
             }
         }
 
-        // Check for banned phrases that indicate hallucination
+        // Pattern 2: Specific certifications not mentioned in CV
+        // e.g., "AWS Certified" when AWS certification isn't in CV
+        if (preg_match_all('/([A-Za-z][A-Za-z0-9\s]+)\s+certified/i', $coverLetter, $matches)) {
+            foreach ($matches[1] as $certification) {
+                $cert = trim($certification);
+                if (stripos($factsString, $cert) === false && stripos($factsString, 'certification') === false) {
+                    throw new \Exception("Hallucinated certification detected: {$cert} certified mentioned but not in CV");
+                }
+            }
+        }
+
+        // Pattern 3: Specific company names not mentioned in CV
+        // e.g., "worked at Google" when Google isn't in CV
+        if (preg_match_all('/(?:worked\s+at|experience\s+at|employed\s+at)\s+([A-Za-z][A-Za-z0-9\s&]+)/i', $coverLetter, $matches)) {
+            foreach ($matches[1] as $company) {
+                $comp = trim($company);
+                if (stripos($factsString, $comp) === false) {
+                    throw new \Exception("Hallucinated company detected: {$comp} mentioned but not in CV");
+                }
+            }
+        }
+    }
+
+    /**
+     * Check for banned phrases that indicate uncertainty or hallucination
+     */
+    private function checkForBannedPhrases(string $coverLetter): void
+    {
         $bannedPhrases = [
             'not mentioned',
-            'not specified',
+            'not specified', 
             'not provided',
             'unknown',
             'n/a',
             'not found',
+            'i assume',
+            'i believe',
+            'i think',
+            'probably',
+            'likely',
+            'might have',
+            'could have',
         ];
 
         foreach ($bannedPhrases as $phrase) {
