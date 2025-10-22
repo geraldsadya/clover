@@ -74,10 +74,11 @@ class PdfExtractor
             $text = preg_replace('/\s+/', ' ', $text);
             $text = trim($text);
             
-            if (strlen($text) > 15000) {
-                // Keep first 80% and last 20% to preserve important info
-                $firstPart = substr($text, 0, 12000);
-                $lastPart = substr($text, -3000);
+            // Increased limit to capture more CV content
+            if (strlen($text) > 30000) {
+                // Keep first 85% and last 15% to preserve important info
+                $firstPart = substr($text, 0, 25500);
+                $lastPart = substr($text, -4500);
                 $text = $firstPart . ' ... ' . $lastPart;
             }
             
