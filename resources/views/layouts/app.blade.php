@@ -1,3 +1,39 @@
+{{--
+    Main Application Layout - CLOVER CV Cover Letter Generator
+    
+    This layout provides the foundation for the entire application with:
+    
+    DESIGN FEATURES:
+    - Modern curved container design (1200px max-width)
+    - CLOVER branding with green/black 'L' logo
+    - Silvertreebrands company logo integration
+    - White background with green accent color scheme (#6A9C6A)
+    - Responsive design with mobile-first approach
+    
+    TECHNICAL FEATURES:
+    - Alpine.js for interactive frontend functionality
+    - Custom CSS with CSS variables for maintainability
+    - Security headers and CSRF protection
+    - Accessibility features (WCAG AA compliance)
+    - Performance optimizations (font preloading)
+    
+    UI COMPONENTS:
+    - Drag-and-drop file upload with visual feedback
+    - Loading states with animated progress steps
+    - Toast notifications for user feedback
+    - Dismissible error alerts with specific messages
+    - File preview with icon, name, size, and remove button
+    
+    BRANDING:
+    - CLOVER logo with 4rem font size (prominent)
+    - Silvertreebrands logo positioned on the left
+    - Green color scheme throughout the interface
+    - Professional typography with Figtree font family
+    
+    @author Gerald Sadya
+    @version 1.1.0
+    @since 2025-01-21
+--}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -90,7 +126,7 @@
         }
 
         .logo-text {
-            font-size: 3rem;
+            font-size: 4rem; /* Increased from 3.5rem */
             font-weight: 700;
             color: var(--light-green);
             letter-spacing: 3px;
@@ -105,7 +141,7 @@
             text-align: center; 
             color: var(--text-muted); 
             margin-bottom: 0; /* No space after title */
-            font-size: 1.2rem;
+            font-size: 1.1rem; /* Reduced from 1.2rem */
             font-weight: 400;
         }
 
@@ -114,7 +150,7 @@
             color: var(--text-muted); 
             margin-top: 0; /* No space before subtitle */
             margin-bottom: var(--spacing-lg);
-            font-size: 1.1rem;
+            font-size: 0.85rem; /* Reduced from 0.95rem */
         }
 
         .form-group { 

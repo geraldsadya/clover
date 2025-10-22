@@ -1,5 +1,28 @@
 <?php
 
+/**
+ * OpenAI Configuration - CLOVER Application
+ * 
+ * Configuration for OpenAI/Azure OpenAI API integration.
+ * Supports both OpenAI and Azure OpenAI endpoints.
+ * 
+ * Key Settings:
+ * - API Key: OPENAI_API_KEY environment variable
+ * - Base URL: OPENAI_BASE_URL (supports Azure endpoints)
+ * - Organization: OPENAI_ORGANIZATION (optional)
+ * - Project: OPENAI_PROJECT (optional)
+ * - Timeout: 30 seconds default
+ * 
+ * Azure OpenAI Support:
+ * - Set OPENAI_BASE_URL to Azure endpoint
+ * - Format: https://your-resource.openai.azure.com/
+ * - Uses deployment-specific model names
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 return [
 
     /*

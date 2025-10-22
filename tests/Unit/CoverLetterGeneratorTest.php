@@ -1,5 +1,30 @@
 <?php
 
+/**
+ * Cover Letter Generator Unit Tests
+ * 
+ * Unit tests for the CoverLetterGenerator service.
+ * Tests the core AI pipeline logic including CV validation and cover letter generation.
+ * 
+ * Test Coverage:
+ * - CV validation system (keyword scoring)
+ * - Facts extraction from CV text
+ * - Cover letter composition
+ * - Error handling and edge cases
+ * - Word count validation
+ * - Anti-hallucination measures
+ * - Retry logic and fallback mechanisms
+ * 
+ * Mocking:
+ * - OpenAI API calls are mocked to avoid external dependencies
+ * - Tests focus on business logic and validation
+ * - Edge cases and error scenarios are thoroughly tested
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 namespace Tests\Unit;
 
 use App\Services\CoverLetterGenerator;

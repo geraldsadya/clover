@@ -1,5 +1,32 @@
 <?php
 
+/**
+ * SecurityHeaders Middleware
+ * 
+ * Implements comprehensive security headers for the CLOVER application.
+ * Provides defense against common web vulnerabilities and attacks.
+ * 
+ * Security Headers:
+ * - Content Security Policy (CSP) with nonce support
+ * - X-Frame-Options: Prevents clickjacking
+ * - X-Content-Type-Options: Prevents MIME sniffing
+ * - Referrer-Policy: Controls referrer information
+ * - Permissions-Policy: Restricts browser features
+ * - Strict-Transport-Security: Enforces HTTPS
+ * - X-XSS-Protection: XSS filtering
+ * - Cross-Origin policies: CORS protection
+ * 
+ * CSP Configuration:
+ * - Allows Alpine.js from CDN
+ * - Allows Figtree fonts from Bunny.net
+ * - Restricts all other external resources
+ * - Uses nonce for inline scripts
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 namespace App\Http\Middleware;
 
 use Closure;

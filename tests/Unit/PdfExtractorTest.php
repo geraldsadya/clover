@@ -1,5 +1,34 @@
 <?php
 
+/**
+ * PDF Extractor Unit Tests - CLOVER Application
+ * 
+ * Unit tests for the PdfExtractor service.
+ * Tests PDF text extraction functionality, validation, and error handling.
+ * 
+ * Test Coverage:
+ * - Valid PDF text extraction
+ * - File type validation (MIME type, magic bytes)
+ * - Corrupt PDF handling
+ * - Empty PDF detection
+ * - Text cleaning and normalization
+ * - Long text truncation
+ * - Temporary file cleanup
+ * - Error handling and exceptions
+ * 
+ * Edge Cases Tested:
+ * - Non-PDF files with PDF extension
+ * - Corrupted PDF files
+ * - Empty PDF files
+ * - Very large PDF files
+ * - Files with special characters
+ * - Temporary file management
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 namespace Tests\Unit;
 
 use App\Exceptions\PdfExtractionException;

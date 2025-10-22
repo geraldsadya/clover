@@ -1,5 +1,24 @@
 <?php
 
+/**
+ * Create Cache Tables Migration
+ * 
+ * Creates cache tables for the CLOVER application.
+ * Used for rate limiting and session storage.
+ * 
+ * Tables Created:
+ * - cache: Application cache storage
+ * - cache_locks: Cache locking mechanism
+ * 
+ * Usage:
+ * - Rate limiting middleware uses cache for request counting
+ * - Session storage for user state management
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

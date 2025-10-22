@@ -1,3 +1,39 @@
+{{--
+    Cover Letter Generation Form - CLOVER Application
+    
+    This is the main interface for the CV Cover Letter Generator application.
+    Provides a complete user experience from file upload to cover letter generation.
+    
+    FORM FEATURES:
+    - Drag-and-drop PDF upload with visual feedback
+    - Job description textarea with character counter
+    - Real-time file preview with remove option
+    - Form validation with specific error messages
+    
+    UI COMPONENTS:
+    - CLOVER branding with Silvertreebrands logo
+    - Loading states with animated progress steps
+    - Toast notifications for success feedback
+    - Dismissible error alerts with actionable solutions
+    - Copy-to-clipboard functionality for generated content
+    
+    INTERACTIVE FEATURES:
+    - Alpine.js for frontend state management
+    - File upload handling with preview
+    - AJAX form submission with progress tracking
+    - Error handling with user-friendly messages
+    - Responsive design for mobile and desktop
+    
+    ACCESSIBILITY:
+    - ARIA labels and roles for screen readers
+    - Keyboard navigation support
+    - High contrast color scheme
+    - Focus indicators for interactive elements
+    
+    @author Gerald Sadya
+    @version 1.1.0
+    @since 2025-01-21
+--}}
 @extends('layouts.app')
 
 @section('content')

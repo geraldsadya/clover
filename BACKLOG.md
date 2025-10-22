@@ -1,6 +1,5 @@
 # CV Cover Letter Generator - Development Backlog
 
-## THE CORRECT BUILD SEQUENCE
 
 ### Phase 0: Backlog Creation ✅ (YOU ARE HERE)
 This document represents the completed backlog. Next: create GitHub issues.
@@ -445,34 +444,3 @@ golden/
   ]
 }
 ```
-
----
-
-## READY TO START?
-
-**Next command**: Create GitHub repo, then create issues A-K!
-
-```bash
-# 1. Create repo on GitHub (via web UI)
-# 2. Clone locally
-git clone https://github.com/[your-username]/cv-cover-letter-generator.git
-cd cv-cover-letter-generator
-
-# 3. Initialize Laravel
-composer create-project laravel/laravel . --prefer-dist
-
-# 4. Create golden/ and docs/ directories
-mkdir -p golden/{cvs,jobs} docs
-
-# 5. Create skeleton files
-touch docs/BUILD_LOG.md docs/QA_CHECKLIST.md
-
-# 6. Commit initial structure
-git add .
-git commit -m "Initial project structure"
-git push origin main
-
-# 7. Create GitHub issues A-K (via GitHub web UI or CLI)
-# Then start Ticket A!
-```
-

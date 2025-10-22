@@ -1,5 +1,22 @@
 <?php
 
+/**
+ * Application Entry Point - CLOVER Application
+ * 
+ * Main entry point for the CLOVER CV Cover Letter Generator.
+ * Handles request routing and application bootstrapping.
+ * 
+ * Features:
+ * - Maintenance mode detection
+ * - Composer autoloader registration
+ * - Laravel application bootstrapping
+ * - Request handling and routing
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 

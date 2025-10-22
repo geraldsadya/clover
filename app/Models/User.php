@@ -1,5 +1,23 @@
 <?php
 
+/**
+ * User Model
+ * 
+ * Standard Laravel User model for authentication.
+ * Currently not used in CLOVER as it's a stateless application,
+ * but maintained for future user management features.
+ * 
+ * Features:
+ * - Mass assignable attributes (name, email, password)
+ * - Hidden attributes for security (password, remember_token)
+ * - Automatic password hashing
+ * - Email verification support
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;

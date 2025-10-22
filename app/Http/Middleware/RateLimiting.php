@@ -1,5 +1,29 @@
 <?php
 
+/**
+ * RateLimiting Middleware
+ * 
+ * Custom rate limiting middleware for the CLOVER application.
+ * Implements IP-based rate limiting with cache storage and retry-after logic.
+ * 
+ * Features:
+ * - IP-based rate limiting (10 requests per hour)
+ * - Cache-based request counting
+ * - Retry-after headers for client guidance
+ * - Comprehensive logging for monitoring
+ * - Rate limit headers in responses
+ * 
+ * Rate Limiting Logic:
+ * - Tracks requests per IP address
+ * - Blocks IPs that exceed 10 requests/hour
+ * - Sets 1-hour retry-after period
+ * - Provides clear error messages
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 namespace App\Http\Middleware;
 
 use Closure;

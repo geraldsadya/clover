@@ -1,5 +1,28 @@
 <?php
 
+/**
+ * RequestId Middleware
+ * 
+ * Generates unique request IDs for request correlation and debugging.
+ * Essential for tracing requests through logs and error tracking.
+ * 
+ * Features:
+ * - UUID generation for each request
+ * - Request ID in request headers
+ * - Request ID in response headers
+ * - Enables request tracing across logs
+ * 
+ * Benefits:
+ * - Easy debugging and error tracking
+ * - Request correlation in distributed systems
+ * - Performance monitoring per request
+ * - User support and issue resolution
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 namespace App\Http\Middleware;
 
 use Closure;

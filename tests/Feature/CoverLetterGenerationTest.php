@@ -1,5 +1,31 @@
 <?php
 
+/**
+ * Cover Letter Generation Feature Tests
+ * 
+ * Comprehensive feature tests for the CLOVER CV Cover Letter Generator.
+ * Tests the complete user workflow from form display to cover letter generation.
+ * 
+ * Test Coverage:
+ * - Form display and validation
+ * - File upload validation (PDF, size limits)
+ * - Job description validation (length limits)
+ * - Health check endpoint
+ * - Accessibility features (WCAG AA compliance)
+ * - Mobile responsiveness
+ * - Alpine.js state management
+ * - Loading states and error handling
+ * - Copy-to-clipboard functionality
+ * - Drag-and-drop file upload
+ * - Focus management and keyboard navigation
+ * - CSP nonce support
+ * - Word count display
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 namespace Tests\Feature;
 
 use Illuminate\Http\UploadedFile;

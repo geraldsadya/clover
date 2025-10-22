@@ -1,5 +1,31 @@
 <?php
 
+/**
+ * GenerateCoverLetterRequest
+ * 
+ * Form request validation for cover letter generation.
+ * Ensures all required data is present and properly formatted before processing.
+ * 
+ * Validation Rules:
+ * - CV file: Required PDF file, max 10MB, PDF MIME type
+ * - Job description: Required string, 50-10,000 characters
+ * 
+ * Security Features:
+ * - CSRF protection (inherited from FormRequest)
+ * - File type validation (PDF only)
+ * - File size limits (10MB maximum)
+ * - Input sanitization and length limits
+ * 
+ * Error Messages:
+ * - Custom error messages for better user experience
+ * - Specific validation feedback for each field
+ * - Clear guidance on file requirements
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;

@@ -1,5 +1,28 @@
 <?php
 
+/**
+ * Health Check Feature Tests - CLOVER Application
+ * 
+ * Tests for the health check endpoint (/healthz) of the CLOVER application.
+ * Verifies system health monitoring and component status reporting.
+ * 
+ * Test Coverage:
+ * - Health check endpoint response structure
+ * - Database connectivity verification
+ * - Storage accessibility checks
+ * - PDF processing tool availability
+ * - OpenAI configuration status
+ * - Degraded status reporting
+ * - Request ID middleware integration
+ * - Token usage logging
+ * - Cost calculation in responses
+ * - PII-safe logging verification
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;

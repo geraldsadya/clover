@@ -1,5 +1,34 @@
 <?php
 
+/**
+ * Security Feature Tests - CLOVER Application
+ * 
+ * Comprehensive security tests for the CLOVER CV Cover Letter Generator.
+ * Verifies security headers, rate limiting, PII protection, and input validation.
+ * 
+ * Test Coverage:
+ * - Security headers (CSP, X-Frame-Options, HSTS, etc.)
+ * - Request ID middleware functionality
+ * - Rate limiting enforcement (10 requests/hour)
+ * - PII-safe logging verification
+ * - Privacy notice display
+ * - File upload security (type, size validation)
+ * - CSRF protection verification
+ * - Input sanitization and validation
+ * 
+ * Security Features Tested:
+ * - Content Security Policy with nonce support
+ * - Cross-Origin policies and frame protection
+ * - XSS and clickjacking protection
+ * - File upload restrictions and validation
+ * - Rate limiting with proper headers
+ * - PII protection in logs and responses
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;

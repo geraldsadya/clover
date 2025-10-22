@@ -1,5 +1,40 @@
 <?php
 
+/**
+ * OpenAIClient Service
+ * 
+ * Handles communication with OpenAI/Azure OpenAI API for AI-powered cover letter generation.
+ * Supports both OpenAI and Azure OpenAI endpoints with automatic endpoint detection.
+ * 
+ * Key Features:
+ * - Dual endpoint support (OpenAI + Azure OpenAI)
+ * - Automatic endpoint detection and URL formatting
+ * - Comprehensive error handling and retry logic
+ * - Token usage tracking and cost estimation
+ * - Request/response logging for observability
+ * - Production-ready timeout and retry configuration
+ * 
+ * Endpoint Support:
+ * - OpenAI: https://api.openai.com/v1/chat/completions
+ * - Azure OpenAI: https://your-resource.openai.azure.com/openai/deployments/your-deployment/chat/completions
+ * 
+ * Configuration:
+ * - Model: GPT-4.1 (Azure) or GPT-4o-mini (OpenAI)
+ * - Max tokens: 600 (supports up to ~450 words)
+ * - Timeout: 30 seconds
+ * - Retry attempts: 3 with exponential backoff
+ * 
+ * Error Handling:
+ * - Network timeouts and connection errors
+ * - API rate limiting and quota exceeded
+ * - Invalid API keys and authentication errors
+ * - Model availability and region restrictions
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 namespace App\Services;
 
 use GuzzleHttp\Client;

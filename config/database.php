@@ -1,5 +1,27 @@
 <?php
 
+/**
+ * Database Configuration - CLOVER Application
+ * 
+ * Database configuration for the CLOVER CV Cover Letter Generator.
+ * Uses SQLite for simplicity and Railway deployment compatibility.
+ * 
+ * Configuration:
+ * - Default: SQLite database
+ * - File: database/database.sqlite
+ * - Sessions: Database-driven sessions
+ * - Cache: File-based cache (no database dependency)
+ * 
+ * Production Notes:
+ * - Railway provides persistent storage for SQLite
+ * - No external database dependencies
+ * - Automatic migrations on deployment
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 use Illuminate\Support\Str;
 
 return [

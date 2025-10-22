@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * Create Users Table Migration
+ * 
+ * Creates the users table and related authentication tables for the CLOVER application.
+ * Currently not used as CLOVER is a stateless application, but maintained for future features.
+ * 
+ * Tables Created:
+ * - users: User authentication and profile data
+ * - password_reset_tokens: Password reset functionality
+ * - sessions: Session storage for user authentication
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

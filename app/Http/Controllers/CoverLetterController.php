@@ -1,5 +1,37 @@
 <?php
 
+/**
+ * CoverLetterController
+ * 
+ * Main controller for the CV Cover Letter Generator application.
+ * Handles the complete workflow from PDF upload to cover letter generation.
+ * 
+ * Workflow:
+ * 1. Display the cover letter generation form (index)
+ * 2. Process PDF upload and job description (generate)
+ * 3. Extract text from PDF using PdfExtractor
+ * 4. Validate CV using CoverLetterGenerator's validation system
+ * 5. Extract facts and generate cover letter using AI
+ * 6. Return structured JSON response with results
+ * 
+ * Key Features:
+ * - Comprehensive error handling with specific error codes
+ * - Request tracking with UUID correlation
+ * - Performance monitoring and cost estimation
+ * - PII-safe logging (no sensitive data in logs)
+ * - Production-ready security and validation
+ * 
+ * Error Handling:
+ * - CV_PROCESSING_FAILED: Document validation or AI extraction issues
+ * - PDF_EXTRACTION_FAILED: PDF parsing or text extraction problems
+ * - RATE_LIMIT_EXCEEDED: Too many requests from same IP
+ * - VALIDATION_FAILED: Form validation errors
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\GenerateCoverLetterRequest;
@@ -29,6 +61,23 @@ class CoverLetterController extends Controller
 
     /**
      * Handle form submission and generate cover letter
+     * 
+     * This is the main processing method that orchestrates the entire workflow:
+     * 1. Validates uploaded PDF and job description
+     * 2. Extracts text from PDF using PdfExtractor
+     * 3. Validates if document is actually a CV (zero-cost validation)
+     * 4. Extracts structured facts using AI (Stage 1)
+     * 5. Generates personalized cover letter (Stage 2)
+     * 6. Returns structured JSON response
+     * 
+     * Error Handling:
+     * - Specific error messages based on failure reason
+     * - Request ID correlation for debugging
+     * - Performance metrics and cost estimation
+     * - PII-safe logging (no sensitive data)
+     * 
+     * @param GenerateCoverLetterRequest $request Validated form data
+     * @return JsonResponse Structured response with cover letter or error
      */
     public function generate(GenerateCoverLetterRequest $request): JsonResponse
     {

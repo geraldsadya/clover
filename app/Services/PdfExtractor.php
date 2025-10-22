@@ -1,5 +1,40 @@
 <?php
 
+/**
+ * PdfExtractor Service
+ * 
+ * Handles PDF text extraction using Smalot/PdfParser (pure PHP solution).
+ * This service provides robust PDF processing without external dependencies.
+ * 
+ * Key Features:
+ * - Pure PHP implementation (no external binaries required)
+ * - Comprehensive file validation (MIME type, magic bytes, size limits)
+ * - UTF-8 encoding normalization and text cleaning
+ * - Intelligent text truncation (preserves important sections)
+ * - Graceful error handling with specific exception types
+ * 
+ * File Validation:
+ * - Maximum file size: 10MB
+ * - MIME type validation: application/pdf
+ * - Magic byte validation: %PDF header check
+ * - Text extraction validation: ensures readable content
+ * 
+ * Text Processing:
+ * - UTF-8 encoding normalization
+ * - Whitespace normalization
+ * - Smart truncation (first 80% + last 20% for large files)
+ * - Maximum text length: 15,000 characters
+ * 
+ * Error Handling:
+ * - PdfExtractionException for specific error scenarios
+ * - Detailed error messages for debugging
+ * - Automatic cleanup of temporary files
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 namespace App\Services;
 
 use Illuminate\Http\UploadedFile;

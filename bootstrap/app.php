@@ -1,5 +1,23 @@
 <?php
 
+/**
+ * Application Bootstrap - CLOVER Application
+ * 
+ * Main application bootstrap file for the CLOVER CV Cover Letter Generator.
+ * Configures routing, middleware, and exception handling.
+ * 
+ * Configuration:
+ * - Web routes from routes/web.php
+ * - Console commands from routes/console.php
+ * - Health check endpoint at /up
+ * - Global middleware: RequestId, SecurityHeaders
+ * - API middleware: RateLimiting
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;

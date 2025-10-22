@@ -1,5 +1,23 @@
 <?php
 
+/**
+ * Application Configuration - CLOVER Application
+ * 
+ * Main application configuration for the CLOVER CV Cover Letter Generator.
+ * Contains core settings for the Laravel application.
+ * 
+ * Key Settings:
+ * - Application Name: CLOVER
+ * - Environment: Production/Development
+ * - Debug Mode: Controlled by APP_DEBUG
+ * - Encryption Key: APP_KEY for security
+ * - URL: APP_URL for proper routing
+ * 
+ * @author Gerald Sadya
+ * @version 1.1.0
+ * @since 2025-01-21
+ */
+
 return [
 
     /*
