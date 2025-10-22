@@ -927,20 +927,17 @@ class CoverLetterGenerator
      */
     private function checkForBannedPhrases(string $coverLetter): void
     {
+        // Only ban phrases that clearly indicate the AI doesn't have the information
         $bannedPhrases = [
             'not mentioned',
             'not specified', 
             'not provided',
+            'not available',
             'unknown',
             'n/a',
             'not found',
-            'i assume',
-            'i believe',
-            'i think',
-            'probably',
-            'likely',
-            'might have',
-            'could have',
+            'information not provided',
+            'details not available',
         ];
 
         foreach ($bannedPhrases as $phrase) {
