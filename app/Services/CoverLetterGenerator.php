@@ -342,7 +342,7 @@ class CoverLetterGenerator
         $messages = [
             [
                 'role' => 'system',
-                'content' => 'You are a professional CV analyzer. Extract structured facts from CV text and return ONLY valid JSON. Do not invent information that is not explicitly stated. For optional fields, use empty arrays if not found.',
+                'content' => 'You are a professional CV analyzer. Extract structured facts from CV text and return ONLY valid JSON. IMPORTANT: Read the ENTIRE CV carefully from beginning to end. Pay special attention to all sections including skills, experience, education, certifications, and any additional information at the end. Do not invent information that is not explicitly stated. For optional fields, use empty arrays if not found.',
             ],
             [
                 'role' => 'user',
@@ -362,17 +362,18 @@ class CoverLetterGenerator
         $cvText = mb_convert_encoding($cvText, 'UTF-8', 'UTF-8');
         $cvText = filter_var($cvText, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
         
-        $basePrompt = "Extract information from this CV text and return ONLY valid JSON with no additional text:\n\n";
+        $basePrompt = "Extract information from this CV text and return ONLY valid JSON with no additional text.\n\n";
+        $basePrompt .= "CRITICAL: Read the ENTIRE CV text from start to finish. Extract ALL skills, experience, education, certifications, projects, achievements, and languages mentioned ANYWHERE in the CV, including information at the very end.\n\n";
 
         $schema = [
             'name' => 'Full name (string)',
-            'skills' => 'Array of technical skills and tools mentioned',
-            'experience' => 'Array of work experience with company, role, duration',
-            'education' => 'Array of education with institution, degree, year',
-            'certifications' => 'Array of certifications (empty array if none)',
-            'projects' => 'Array of projects (empty array if none)',
-            'achievements' => 'Array of achievements (empty array if none)',
-            'languages' => 'Array of languages (empty array if none)',
+            'skills' => 'Array of ALL technical skills and tools mentioned ANYWHERE in the CV',
+            'experience' => 'Array of ALL work experience with company, role, duration',
+            'education' => 'Array of ALL education with institution, degree, year',
+            'certifications' => 'Array of ALL certifications (empty array if none)',
+            'projects' => 'Array of ALL projects (empty array if none)',
+            'achievements' => 'Array of ALL achievements (empty array if none)',
+            'languages' => 'Array of ALL languages (empty array if none)',
             'years_of_experience' => 'Total years of experience (integer)',
         ];
 
@@ -385,7 +386,7 @@ class CoverLetterGenerator
             $basePrompt .= 'IMPORTANT: This is a retry attempt. Ensure the JSON is perfectly valid and follows the exact schema. ';
         }
 
-        $basePrompt .= $schemaText."\nCV Text:\n".$cvText;
+        $basePrompt .= $schemaText."\n\nCV Text:\n".$cvText;
 
         return $basePrompt;
     }
