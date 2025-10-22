@@ -177,6 +177,9 @@ class CoverLetterGeneratorTest extends TestCase
             'experience' => [['company' => 'TechCorp', 'role' => 'Developer']],
             'education' => [['institution' => 'University', 'degree' => 'Computer Science']],
             'certifications' => [],
+            'projects' => [],
+            'achievements' => [],
+            'languages' => [],
             'years_of_experience' => 3,
         ]);
 
@@ -203,6 +206,9 @@ class CoverLetterGeneratorTest extends TestCase
             'experience' => [['company' => 'TechCorp', 'role' => 'Developer']],
             'education' => [['institution' => 'University', 'degree' => 'Computer Science']],
             'certifications' => [],
+            'projects' => [],
+            'achievements' => [],
+            'languages' => [],
             'years_of_experience' => 3,
         ])."\n```";
 

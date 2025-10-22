@@ -294,7 +294,7 @@ class CoverLetterGenerator
         $messages = [
             [
                 'role' => 'system',
-                'content' => 'You are a professional CV analyzer. Extract structured facts from CV text and return ONLY valid JSON. Do not invent information that is not explicitly stated.',
+                'content' => 'You are a professional CV analyzer. Extract structured facts from CV text and return ONLY valid JSON. Do not invent information that is not explicitly stated. For optional fields, use empty arrays if not found.',
             ],
             [
                 'role' => 'user',
@@ -314,15 +314,18 @@ class CoverLetterGenerator
         $cvText = mb_convert_encoding($cvText, 'UTF-8', 'UTF-8');
         $cvText = filter_var($cvText, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
         
-        $basePrompt = "Extract the following information from this CV text and return ONLY valid JSON with no additional text:\n\n";
+        $basePrompt = "Extract information from this CV text and return ONLY valid JSON with no additional text:\n\n";
 
         $schema = [
             'name' => 'Full name (string)',
-            'skills' => 'Array of technical skills mentioned',
-            'experience' => 'Array of work experience entries with company, role, duration',
-            'education' => 'Array of education entries with institution, degree, year',
-            'certifications' => 'Array of certifications mentioned',
-            'years_of_experience' => 'Total years of professional experience (integer)',
+            'skills' => 'Array of technical skills and tools mentioned',
+            'experience' => 'Array of work experience with company, role, duration',
+            'education' => 'Array of education with institution, degree, year',
+            'certifications' => 'Array of certifications (empty array if none)',
+            'projects' => 'Array of projects (empty array if none)',
+            'achievements' => 'Array of achievements (empty array if none)',
+            'languages' => 'Array of languages (empty array if none)',
+            'years_of_experience' => 'Total years of experience (integer)',
         ];
 
         $schemaText = "Required JSON schema:\n";
@@ -356,6 +359,15 @@ class CoverLetterGenerator
         }
         $cleanResponse = trim($cleanResponse);
 
+        // Remove control characters and fix encoding issues
+        $cleanResponse = preg_replace('/[\x00-\x1F\x7F]/', '', $cleanResponse);
+        $cleanResponse = mb_convert_encoding($cleanResponse, 'UTF-8', 'UTF-8');
+        
+        // Try to find JSON content if there's extra text
+        if (preg_match('/\{.*\}/s', $cleanResponse, $matches)) {
+            $cleanResponse = $matches[0];
+        }
+
         // Parse JSON
         $facts = json_decode($cleanResponse, true);
 
@@ -385,6 +397,9 @@ class CoverLetterGenerator
             'experience' => 'present|array|min:1',  // Must have at least 1 work experience
             'education' => 'present|array|min:1',  // Must have at least 1 education entry
             'certifications' => 'present|array',
+            'projects' => 'sometimes|array',  // Optional - only validate if present
+            'achievements' => 'sometimes|array',  // Optional - only validate if present
+            'languages' => 'sometimes|array',  // Optional - only validate if present
             'years_of_experience' => 'required|integer|min:0|max:50',
         ]);
 
