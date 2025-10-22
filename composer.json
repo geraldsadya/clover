@@ -1,5 +1,5 @@
 {
-    "name": "cv-cover-letter-generator",
+    "name": "cv-cover-letter/cv-cover-letter-generator",
     "type": "project",
     "description": "AI-powered CV Cover Letter Generator",
     "keywords": ["laravel", "framework", "ai", "cover-letter"],
