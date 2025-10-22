@@ -628,7 +628,7 @@ class CoverLetterGenerator
         $messages = [
             [
                 'role' => 'system',
-                'content' => 'You are a professional cover letter writer. Write compelling, personalized cover letters that are grounded in the provided facts. Do not invent information that is not explicitly provided.',
+                'content' => 'You are a professional cover letter writer specializing in job-candidate matching analysis. Write compelling cover letters that specifically demonstrate why a candidate\'s background makes them ideally suited for a particular role. Focus on matching specific qualifications to job requirements and explaining the fit.',
             ],
             [
                 'role' => 'user',
@@ -651,29 +651,29 @@ class CoverLetterGenerator
         $sanitizedJobDescription = mb_convert_encoding($sanitizedJobDescription, 'UTF-8', 'UTF-8');
         $sanitizedJobDescription = filter_var($sanitizedJobDescription, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
         
-        $basePrompt = "Write a professional cover letter for {$companyAndRole['role']} at {$companyAndRole['company']}.\n\n";
+        $basePrompt = "Write a professional cover letter that demonstrates WHY this candidate is ideally suited for the {$companyAndRole['role']} position at {$companyAndRole['company']}.\n\n";
 
         $basePrompt .= "REQUIREMENTS:\n";
         $basePrompt .= "- 2-3 paragraphs, 100-450 words total (adjust length based on experience level)\n";
-        $basePrompt .= "- Include company name and role\n";
-        $basePrompt .= "- Use ONLY the facts provided below\n";
-        $basePrompt .= "- Do not invent skills, experience, or qualifications not mentioned\n";
-        $basePrompt .= "- Write in first person\n";
-        $basePrompt .= "- Be professional and compelling\n";
+        $basePrompt .= "- Analyze the job requirements and match them to the candidate's specific qualifications\n";
+        $basePrompt .= "- Explain WHY this particular CV makes the candidate ideally suited for THIS specific role\n";
+        $basePrompt .= "- Highlight specific skills, experience, or achievements that directly align with the job needs\n";
+        $basePrompt .= "- Use ONLY the facts provided below - do not invent skills, experience, or qualifications\n";
+        $basePrompt .= "- Write in first person, be professional and compelling\n";
         $basePrompt .= "- For junior candidates with limited experience, keep it concise (100-200 words)\n";
         $basePrompt .= "- For senior candidates with extensive experience, be more comprehensive (250-450 words)\n\n";
 
         if ($attempt > 0) {
-            $basePrompt .= "IMPORTANT: This is a retry attempt. Ensure the word count is between 100-450 words (adjust for experience level) and the content is grounded in the provided facts only.\n\n";
+            $basePrompt .= "IMPORTANT: This is a retry attempt. Focus on specific job-candidate matching and ensure the word count is between 100-450 words (adjust for experience level).\n\n";
         }
-
-        $basePrompt .= "CANDIDATE FACTS:\n";
-        $basePrompt .= json_encode($facts, JSON_PRETTY_PRINT)."\n\n";
 
         $basePrompt .= "JOB DESCRIPTION:\n";
         $basePrompt .= $sanitizedJobDescription."\n\n";
 
-        $basePrompt .= 'Write the cover letter now:';
+        $basePrompt .= "CANDIDATE FACTS:\n";
+        $basePrompt .= json_encode($facts, JSON_PRETTY_PRINT)."\n\n";
+
+        $basePrompt .= "Write a cover letter that specifically addresses how this candidate's background makes them ideally suited for this particular role:";
 
         return $basePrompt;
     }

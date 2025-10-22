@@ -174,8 +174,8 @@ class CoverLetterGeneratorTest extends TestCase
         $validJson = json_encode([
             'name' => 'John Doe',
             'skills' => ['PHP'],
-            'experience' => [],
-            'education' => [],
+            'experience' => [['company' => 'TechCorp', 'role' => 'Developer']],
+            'education' => [['institution' => 'University', 'degree' => 'Computer Science']],
             'certifications' => [],
             'years_of_experience' => 3,
         ]);
@@ -200,8 +200,8 @@ class CoverLetterGeneratorTest extends TestCase
         $markdownJson = '```json'."\n".json_encode([
             'name' => 'John Doe',
             'skills' => ['PHP'],
-            'experience' => [],
-            'education' => [],
+            'experience' => [['company' => 'TechCorp', 'role' => 'Developer']],
+            'education' => [['institution' => 'University', 'degree' => 'Computer Science']],
             'certifications' => [],
             'years_of_experience' => 3,
         ])."\n```";
@@ -636,7 +636,7 @@ class CoverLetterGeneratorTest extends TestCase
         $prompt = $method->invoke($this->generator, $facts, $jobDescription, $companyAndRole, 0);
 
         $this->assertStringContainsString('Software Engineer at TechCorp', $prompt);
-        $this->assertStringContainsString('150-300 words', $prompt);
+        $this->assertStringContainsString('100-450 words', $prompt);
         $this->assertStringContainsString('2-3 paragraphs', $prompt);
         $this->assertStringContainsString('John Doe', $prompt);
         $this->assertStringContainsString('PHP', $prompt);
@@ -667,7 +667,7 @@ class CoverLetterGeneratorTest extends TestCase
         $retryPrompt = $method->invoke($this->generator, $facts, $jobDescription, $companyAndRole, 1);
 
         $this->assertStringContainsString('IMPORTANT: This is a retry attempt', $retryPrompt);
-        $this->assertStringContainsString('150-300 words', $retryPrompt);
+        $this->assertStringContainsString('100-450 words', $retryPrompt);
     }
 
     /**
